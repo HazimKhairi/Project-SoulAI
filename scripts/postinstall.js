@@ -14,7 +14,7 @@ console.log(chalk.blue('🚀 SoulAI Post-Install Setup\n'))
 async function checkClaudePlan() {
   console.log(chalk.cyan('📊 Claude Plan Compatibility Check\n'))
 
-  const { plan } = await inquirer.prompt([
+  const answers = await inquirer.prompt([
     {
       type: 'list',
       name: 'plan',
@@ -25,8 +25,28 @@ async function checkClaudePlan() {
         { name: 'Team ($25-30/month)', value: 'team' },
         { name: 'Enterprise (Custom)', value: 'enterprise' }
       ]
+    },
+    {
+      type: 'input',
+      name: 'aiName',
+      message: 'What would you like to name your AI assistant?',
+      default: 'SoulAI',
+      validate: (input) => {
+        if (input.trim().length === 0) {
+          return 'AI name cannot be empty'
+        }
+        if (input.length > 20) {
+          return 'AI name must be 20 characters or less'
+        }
+        if (!/^[a-zA-Z0-9_-]+$/.test(input)) {
+          return 'AI name can only contain letters, numbers, hyphens, and underscores'
+        }
+        return true
+      }
     }
   ])
+
+  const { plan, aiName } = answers
 
   const planInfo = {
     free: {
@@ -143,12 +163,66 @@ async function checkClaudePlan() {
   } else {
     console.log(chalk.green(`  ${info.message}\n`))
   }
+
+  // Return plan and AI name for config
+  return { plan, aiName }
+}
+
+function generateOptimizationConfig(plan) {
+  const optimizations = {
+    free: {
+      maxParallelAgents: 1,
+      contextWindow: 'minimal',       // Load minimal context
+      verificationDepth: 'basic',     // Basic verification only
+      maxMemoryEntries: 10,           // Limited memory
+      enableCaching: true,            // Aggressive caching
+      maxRetries: 1,                  // Fewer retries
+      tokenBudget: 50000,             // 50K tokens max
+      batchSize: 5,                   // Small batches
+      enableParallelVerification: false
+    },
+    pro: {
+      maxParallelAgents: 2,
+      contextWindow: 'medium',        // Moderate context
+      verificationDepth: 'standard',  // Standard verification
+      maxMemoryEntries: 50,           // Good memory
+      enableCaching: true,            // Smart caching
+      maxRetries: 3,                  // Standard retries
+      tokenBudget: 150000,            // 150K tokens
+      batchSize: 10,                  // Medium batches
+      enableParallelVerification: true
+    },
+    team: {
+      maxParallelAgents: 5,
+      contextWindow: 'large',         // Full context
+      verificationDepth: 'comprehensive', // Deep verification
+      maxMemoryEntries: 200,          // Extensive memory
+      enableCaching: true,            // Efficient caching
+      maxRetries: 5,                  // More retries
+      tokenBudget: 500000,            // 500K tokens
+      batchSize: 25,                  // Large batches
+      enableParallelVerification: true
+    },
+    enterprise: {
+      maxParallelAgents: 10,
+      contextWindow: 'unlimited',     // No limits
+      verificationDepth: 'exhaustive', // Maximum verification
+      maxMemoryEntries: 1000,         // Max memory
+      enableCaching: false,           // Fresh data priority
+      maxRetries: 10,                 // Max retries
+      tokenBudget: 2000000,           // 2M tokens
+      batchSize: 50,                  // Max batches
+      enableParallelVerification: true
+    }
+  }
+
+  return optimizations[plan]
 }
 
 async function postInstall() {
   try {
-    // 0. Check Claude plan compatibility
-    await checkClaudePlan()
+    // 0. Check Claude plan compatibility and get user preferences
+    const { plan, aiName } = await checkClaudePlan()
 
     // 1. Initialize git submodules
     console.log('📦 Initializing git submodules...')
@@ -194,20 +268,67 @@ async function postInstall() {
       await fs.mkdir(dir, { recursive: true })
     }
 
-    // 4. Copy default config
-    const defaultConfigSrc = path.join(process.cwd(), 'config/default.json')
-    const defaultConfigDest = path.join(soulaiDir, 'config.json')
+    // 4. Generate and save personalized config
+    console.log('⚙️  Generating optimized configuration...')
+    const optimization = generateOptimizationConfig(plan)
 
-    try {
-      await fs.access(defaultConfigDest)
-      // Config exists, don't overwrite
-    } catch {
-      // Copy default config
-      await fs.copyFile(defaultConfigSrc, defaultConfigDest)
+    const userConfig = {
+      version: '1.0.0',
+      aiName: aiName,
+      plan: plan,
+      optimization: optimization,
+      createdAt: new Date().toISOString(),
+      servers: {
+        superpowers: {
+          enabled: true,
+          socket: path.join(soulaiDir, 'sockets', 'superpowers.sock')
+        },
+        'claude-code': {
+          enabled: true,
+          socket: path.join(soulaiDir, 'sockets', 'claude-code.sock')
+        },
+        design: {
+          enabled: true,
+          socket: path.join(soulaiDir, 'sockets', 'design.sock')
+        },
+        memory: {
+          enabled: true,
+          socket: path.join(soulaiDir, 'sockets', 'memory.sock')
+        },
+        search: {
+          enabled: true,
+          socket: path.join(soulaiDir, 'sockets', 'search.sock')
+        },
+        verification: {
+          enabled: true,
+          socket: path.join(soulaiDir, 'sockets', 'verification.sock')
+        }
+      }
     }
 
-    console.log(chalk.green('\n✅ SoulAI installed successfully!\n'))
-    console.log('Next steps:')
+    const configPath = path.join(soulaiDir, 'config.json')
+
+    try {
+      await fs.access(configPath)
+      // Config exists, merge with existing
+      const existing = JSON.parse(await fs.readFile(configPath, 'utf8'))
+      const merged = { ...existing, ...userConfig }
+      await fs.writeFile(configPath, JSON.stringify(merged, null, 2))
+      console.log(chalk.green(`✓ Updated existing config`))
+    } catch {
+      // Create new config
+      await fs.writeFile(configPath, JSON.stringify(userConfig, null, 2))
+      console.log(chalk.green(`✓ Created config for ${chalk.bold(aiName)}`))
+    }
+
+    console.log(chalk.green(`\n✅ ${aiName} installed successfully!\n`))
+    console.log(chalk.bold('Your Configuration:'))
+    console.log(`  AI Name: ${chalk.cyan(aiName)}`)
+    console.log(`  Plan: ${chalk.cyan(plan.toUpperCase())}`)
+    console.log(`  Max Parallel Agents: ${chalk.cyan(optimization.maxParallelAgents)}`)
+    console.log(`  Token Budget: ${chalk.cyan(optimization.tokenBudget.toLocaleString())}`)
+    console.log(`  Config: ${chalk.gray(configPath)}\n`)
+    console.log(chalk.bold('Next steps:'))
     console.log('  1. Run: ' + chalk.cyan('soulai init') + ' to configure')
     console.log('  2. Add MCP config to Claude Code')
     console.log('  3. Run: ' + chalk.cyan('soulai start') + ' to launch\n')
