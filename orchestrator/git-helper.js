@@ -55,15 +55,21 @@ export class GitHelper {
 
   /**
    * Commit changes with message
+   * @returns {Promise<boolean>} true on success, false on failure
    */
   async commit(message, files = null) {
     if (!await this.isGitRepo()) {
-      throw new Error('Not a git repository')
+      return false
     }
 
-    const addCmd = files ? `git add ${files.join(' ')}` : 'git add .'
-    await execAsync(addCmd, { cwd: this.projectDir })
-    await execAsync(`git commit -m "${message}"`, { cwd: this.projectDir })
+    try {
+      const addCmd = files ? `git add ${files.join(' ')}` : 'git add .'
+      await execAsync(addCmd, { cwd: this.projectDir })
+      await execAsync(`git commit -m "${message}"`, { cwd: this.projectDir })
+      return true
+    } catch {
+      return false
+    }
   }
 
   /**
