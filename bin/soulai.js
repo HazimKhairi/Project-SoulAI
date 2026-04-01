@@ -13,11 +13,23 @@ const __dirname = dirname(__filename)
 
 const commands = {
   async init() {
-    // Run the interactive init script
-    const initScript = join(__dirname, '../scripts/init.js')
+    // Run the NEW skill-based init script
+    const initScript = join(__dirname, '../scripts/init-skill.js')
     const child = spawn('node', [initScript], {
       stdio: 'inherit'
       // No shell: true needed - spawn handles paths with spaces correctly
+    })
+
+    child.on('exit', (code) => {
+      process.exit(code)
+    })
+  },
+
+  async 'init-global'() {
+    // Legacy global init (for backwards compatibility)
+    const initScript = join(__dirname, '../scripts/init.js')
+    const child = spawn('node', [initScript], {
+      stdio: 'inherit'
     })
 
     child.on('exit', (code) => {
@@ -87,9 +99,21 @@ if (commands[command]) {
   commands[command]()
 } else {
   console.log('[INFO] SoulAI Commands:')
-  console.log('  soulai init                  - Initialize configuration')
-  console.log('  soulai start                 - Start orchestrator')
-  console.log('  soulai stop                  - Stop all servers')
-  console.log('  soulai status                - Check status')
-  console.log('  soulai generate-claude-config - Generate Claude Code config')
+  console.log('')
+  console.log('Setup:')
+  console.log('  soulai init                   - Setup skill in current project (RECOMMENDED)')
+  console.log('  soulai init-global            - Global installation (legacy)')
+  console.log('')
+  console.log('Management:')
+  console.log('  soulai start                  - Start orchestrator')
+  console.log('  soulai stop                   - Stop all servers')
+  console.log('  soulai status                 - Check status')
+  console.log('')
+  console.log('Configuration:')
+  console.log('  soulai generate-claude-config - Generate MCP config (legacy)')
+  console.log('')
+  console.log('Quick Start:')
+  console.log('  cd your-project')
+  console.log('  soulai init')
+  console.log('  # Then in Claude Code: /{your-ai-name} help')
 }
