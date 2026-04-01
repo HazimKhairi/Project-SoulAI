@@ -18,6 +18,9 @@ cd your-project
 # Install SoulAI
 npx soulai init
 
+# Update token usage (optional)
+soulai tokens       # Track current Claude usage with progress bars
+
 # Use in Claude Code
 /soulai debug       # Systematic debugging (saves 60% tokens)
 /soulai tdd         # Test-driven development (saves 35% tokens)
@@ -90,6 +93,24 @@ SoulAI auto-adjusts based on your Claude Code plan:
 
 ### Token Usage Tracking
 
+**Track your current token usage automatically:**
+
+```bash
+soulai tokens  # Update current usage with progress bars
+```
+
+**Auto-detection:** Checks 8 locations for Claude Code usage data
+- macOS: `~/Library/Application Support/Claude/`
+- Linux: `~/.config/claude-code/`, `~/.local/share/claude/`
+- Fallback: Manual input with validation
+
+**Example Output:**
+```
+Daily:   45.0K / 571.4K ██░░░░░░░░ 8%
+Weekly:  2.1M  / 4.0M   █████░░░░░ 53%
+Monthly: 8.5M  / 16.0M  █████░░░░░ 53%
+```
+
 **Plan Limits:**
 - Daily Budget: Based on your plan (28K - 571K)
 - Weekly Budget: Based on your plan (200K - 4M)
@@ -153,6 +174,8 @@ npx soulai init
 - [x] 161 skills from 4 submodules
 - [x] MCP bridge configuration
 - [x] Project-specific installation
+- [x] Token usage auto-detection (scripts/token-usage-reader.js)
+- [x] Interactive token update CLI (scripts/update-tokens.js)
 
 ### Phase 2: MCP Server (In Progress)
 
