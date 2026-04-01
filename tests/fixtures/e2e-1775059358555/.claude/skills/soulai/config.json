@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "aiName": "TestAI",
+  "description": "E2E Test AI",
+  "plan": "pro",
+  "features": {
+    "autoCommit": {
+      "enabled": true,
+      "commitOnSuccess": true,
+      "semanticMessages": true,
+      "coAuthorTag": "TestAI",
+      "failSafe": true
+    },
+    "sessionLoader": {
+      "enabled": true,
+      "loadOnStartup": true,
+      "includeDescriptions": true
+    }
+  }
+}
