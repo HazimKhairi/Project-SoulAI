@@ -104,8 +104,15 @@ describe('Full Workflow E2E', () => {
       filesChanged: ['test.js']
     }
 
-    // Step 7: Auto-commit
-    await mcpServer.commitMiddleware.handle(result)
+    // Step 7: Auto-commit with test-specific commit middleware
+    const testCommitMiddleware = new CommitMiddleware({
+      enabled: true,
+      commitOnSuccess: true,
+      semanticMessages: true,
+      coAuthorTag: 'TestAI',
+      failSafe: true
+    }, gitHelperForTest)
+    await testCommitMiddleware.handle(result)
 
     // Step 8: Verify commit created
     expect(await gitHelperForTest.hasUncommittedChanges()).toBe(false)
