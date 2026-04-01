@@ -16,28 +16,28 @@ export class ServerManager {
    * Handle server crash with auto-restart
    */
   async handleServerCrash(serverName, error) {
-    console.error(`❌ ${serverName} crashed:`, error.message)
+    console.error(`[ERROR] ${serverName} crashed:`, error.message)
 
     // Increment crash counter
     this.crashCount[serverName] = (this.crashCount[serverName] || 0) + 1
 
     // Check retry limit
     if (this.crashCount[serverName] > this.MAX_RETRIES) {
-      console.error(`💀 ${serverName} exceeded max retries (${this.MAX_RETRIES})`)
+      console.error(`[FATAL] ${serverName} exceeded max retries (${this.MAX_RETRIES})`)
       await this.disableServer(serverName)
       return { recovered: false }
     }
 
     // Wait before restart
-    console.log(`⏳ Waiting ${this.RESTART_DELAY}ms before restart...`)
+    console.log(`[RESTART] Waiting ${this.RESTART_DELAY}ms before restart...`)
     await this.sleep(this.RESTART_DELAY)
 
     // Restart server
-    console.log(`🔄 Restarting ${serverName}...`)
+    console.log(`[RESTART] Restarting ${serverName}...`)
     const success = await this.spawnServer(serverName)
 
     if (success) {
-      console.log(`✅ ${serverName} restarted successfully`)
+      console.log(`[OK] ${serverName} restarted successfully`)
       this.crashCount[serverName] = 0
       return { recovered: true }
     }

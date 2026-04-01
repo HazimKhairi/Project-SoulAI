@@ -9,10 +9,10 @@ import inquirer from 'inquirer'
 
 const execAsync = promisify(exec)
 
-console.log(chalk.blue('🚀 SoulAI Post-Install Setup\n'))
+console.log(chalk.blue(' SoulAI Post-Install Setup\n'))
 
 async function checkClaudePlan() {
-  console.log(chalk.cyan('📊 Claude Plan Compatibility Check\n'))
+  console.log(chalk.cyan('Claude Plan Compatibility Check\n'))
 
   const answers = await inquirer.prompt([
     {
@@ -118,11 +118,11 @@ async function checkClaudePlan() {
   console.log(chalk.bold(`\n→ You selected: ${info.name} (${info.price})\n`))
 
   if (info.recommendation === 'CRITICAL') {
-    console.log(chalk.red.bold('⚠️  CRITICAL: Plan Not Suitable\n'))
+    console.log(chalk.red.bold('  CRITICAL: Plan Not Suitable\n'))
   } else if (info.recommendation === 'UPGRADE_RECOMMENDED') {
-    console.log(chalk.yellow.bold('⚠️  Plan Compatibility Check\n'))
+    console.log(chalk.yellow.bold('  Plan Compatibility Check\n'))
   } else {
-    console.log(chalk.green.bold('✅ Plan Compatibility Check\n'))
+    console.log(chalk.green.bold(' Plan Compatibility Check\n'))
   }
 
   console.log(chalk.bold('PROS:'))
@@ -225,12 +225,12 @@ async function postInstall() {
     const { plan, aiName } = await checkClaudePlan()
 
     // 1. Initialize git submodules
-    console.log('📦 Initializing git submodules...')
+    console.log(' Initializing git submodules...')
     await execAsync('git submodule init')
     await execAsync('git submodule update --recursive --remote')
 
     // 2. Install submodule dependencies
-    console.log('📚 Installing submodule dependencies...')
+    console.log(' Installing submodule dependencies...')
     const submodules = [
       'submodules/superpowers',
       'submodules/everything-claude-code',
@@ -263,13 +263,13 @@ async function postInstall() {
       path.join(soulaiDir, 'sockets')
     ]
 
-    console.log('📁 Creating SoulAI directories...')
+    console.log(' Creating SoulAI directories...')
     for (const dir of dirs) {
       await fs.mkdir(dir, { recursive: true })
     }
 
     // 4. Generate and save personalized config
-    console.log('⚙️  Generating optimized configuration...')
+    console.log('  Generating optimized configuration...')
     const optimization = generateOptimizationConfig(plan)
 
     const userConfig = {
@@ -321,7 +321,7 @@ async function postInstall() {
       console.log(chalk.green(`✓ Created config for ${chalk.bold(aiName)}`))
     }
 
-    console.log(chalk.green(`\n✅ ${aiName} installed successfully!\n`))
+    console.log(chalk.green(`\n ${aiName} installed successfully!\n`))
     console.log(chalk.bold('Your Configuration:'))
     console.log(`  AI Name: ${chalk.cyan(aiName)}`)
     console.log(`  Plan: ${chalk.cyan(plan.toUpperCase())}`)
@@ -334,7 +334,7 @@ async function postInstall() {
     console.log('  3. Run: ' + chalk.cyan('soulai start') + ' to launch\n')
 
   } catch (error) {
-    console.error(chalk.red('❌ Post-install failed:'), error.message)
+    console.error(chalk.red(' Post-install failed:'), error.message)
     process.exit(1)
   }
 }
