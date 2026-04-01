@@ -28,21 +28,26 @@ export class SessionLoader {
    * Generate skill index
    */
   async generateSkillIndex() {
-    const skills = await this.scanner.scanAll()
-    const index = []
+    try {
+      const skills = await this.scanner.scanAll()
+      const index = []
 
-    for (const submodule of skills) {
-      for (const skill of submodule.skills) {
-        index.push({
-          name: skill.name,
-          command: skill.command,
-          description: skill.description,
-          submodule: submodule.name
-        })
+      for (const submodule of skills) {
+        for (const skill of submodule.skills) {
+          index.push({
+            name: skill.name,
+            command: skill.command,
+            description: skill.description || 'No description',
+            submodule: submodule.name
+          })
+        }
       }
-    }
 
-    return index
+      return index
+    } catch (error) {
+      console.error('[ERROR] Failed to generate skill index:', error.message)
+      return []
+    }
   }
 
   /**
@@ -57,7 +62,9 @@ export class SessionLoader {
     for (const submodule of skills) {
       context += `${submodule.name} (${submodule.count} skills):\n`
       for (const skill of submodule.skills.slice(0, 5)) {
-        context += `  /soulai ${skill.command} - ${skill.description}\n`
+        const desc = skill.description || 'No description'
+        const truncated = desc.length > 80 ? desc.substring(0, 80) + '...' : desc
+        context += `  /soulai ${skill.command} - ${truncated}\n`
       }
       if (submodule.count > 5) {
         context += `  ... and ${submodule.count - 5} more\n`
