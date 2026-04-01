@@ -16,8 +16,8 @@ const commands = {
     // Run the interactive init script
     const initScript = join(__dirname, '../scripts/init.js')
     const child = spawn('node', [initScript], {
-      stdio: 'inherit',
-      shell: true
+      stdio: 'inherit'
+      // No shell: true needed - spawn handles paths with spaces correctly
     })
 
     child.on('exit', (code) => {

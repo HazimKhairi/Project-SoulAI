@@ -3,9 +3,27 @@
   "version": "1.0.0",
   "description": "Open-source workflow agent for coding development",
   "type": "module",
+  "main": "index.js",
   "bin": {
     "soulai": "./bin/soulai.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HazimKhairi/Project-SoulAI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HazimKhairi/Project-SoulAI/issues"
+  },
+  "homepage": "https://github.com/HazimKhairi/Project-SoulAI#readme",
+  "readme": "README.npm.md",
+  "files": [
+    "bin/",
+    "config/",
+    "orchestrator/",
+    "scripts/",
+    "index.js",
+    "README.npm.md"
+  ],
   "scripts": {
     "postinstall": "node scripts/postinstall.js",
     "test": "vitest",
