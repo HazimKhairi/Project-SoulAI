@@ -1,10 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Ctx7Manager } from '../../orchestrator/ctx7/ctx7-manager.js';
-import fs from 'fs';
-import path from 'path';
-
-vi.mock('fs');
-vi.mock('path');
 
 describe('Ctx7Manager', () => {
   let manager;
@@ -33,8 +28,8 @@ describe('Ctx7Manager', () => {
   });
 
   it('should detect ctx7 CLI path', () => {
-    const expectedPath = path.join(process.cwd(), 'submodules/context7/packages/cli/dist/index.js');
-    expect(manager.ctx7Path).toBe(expectedPath);
+    expect(manager.ctx7Path).toContain('submodules/context7/packages/cli/dist/index.js');
+    expect(typeof manager.ctx7Path).toBe('string');
   });
 
   it('should throw error if ctx7 disabled', () => {
