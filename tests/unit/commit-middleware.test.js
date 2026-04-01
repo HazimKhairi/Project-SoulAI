@@ -53,4 +53,22 @@ describe('CommitMiddleware', () => {
     const result = { success: true, skillName: 'debug' }
     await expect(middleware.handle(result)).resolves.not.toThrow()
   })
+
+  test('sanitizes skillName with newlines', () => {
+    const message = middleware.generateCommitMessage('debug\n\n--author=attacker', ['test.js', 'auth.js'])
+    expect(message).not.toContain('\n\n--author')
+    expect(message).toContain('debug  --author=attacker')
+  })
+
+  test('sanitizes filenames with special chars', () => {
+    const message = middleware.generateCommitMessage('debug', ['file\nwith\nnewlines.js'])
+    expect(message).not.toContain('file\nwith\nnewlines.js')
+    expect(message).toContain('file with newlines.js')
+  })
+
+  test('handles empty files array gracefully', () => {
+    const message = middleware.generateCommitMessage('debug', [])
+    expect(message).toContain('Applied skill workflow')
+    expect(message).not.toContain('Files changed:')
+  })
 })

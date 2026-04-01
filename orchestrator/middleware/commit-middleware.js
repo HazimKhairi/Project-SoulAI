@@ -102,20 +102,35 @@ export class CommitMiddleware {
   }
 
   /**
+   * Sanitize string for use in commit messages
+   * Removes newlines and control characters
+   */
+  sanitizeForCommit(str) {
+    if (!str) return ''
+    return str.replace(/[\r\n\t\0]/g, ' ').trim()
+  }
+
+  /**
    * Generate commit description
    */
   generateDescription(skillName, files) {
+    const safeName = this.sanitizeForCommit(skillName)
     if (files.length === 1) {
-      return `update ${files[0]}`
+      const safeFile = this.sanitizeForCommit(files[0])
+      return `update ${safeFile}`
     }
-    return `apply ${skillName} skill changes`
+    return `apply ${safeName} skill changes`
   }
 
   /**
    * Generate commit body
    */
   generateBody(files) {
-    return `Applied skill workflow\nFiles changed: ${files.join(', ')}`
+    if (!Array.isArray(files) || files.length === 0) {
+      return 'Applied skill workflow'
+    }
+    const safeFiles = files.map(f => this.sanitizeForCommit(f)).filter(f => f)
+    return `Applied skill workflow\nFiles changed: ${safeFiles.join(', ')}`
   }
 
   /**
