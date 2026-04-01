@@ -1,14 +1,28 @@
 #!/usr/bin/env node
 
 // bin/soulai.js
+import { spawn } from 'child_process'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 import { ConfigLoader } from '../config/config-loader.js'
 import { ServerManager } from '../orchestrator/server-manager.js'
 import { Gateway } from '../orchestrator/gateway.js'
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 const commands = {
   async init() {
-    console.log('[INFO] Initializing SoulAI...')
-    console.log('[OK] Run: soulai start')
+    // Run the interactive init script
+    const initScript = join(__dirname, '../scripts/init.js')
+    const child = spawn('node', [initScript], {
+      stdio: 'inherit',
+      shell: true
+    })
+
+    child.on('exit', (code) => {
+      process.exit(code)
+    })
   },
 
   async start() {
