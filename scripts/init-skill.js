@@ -4,6 +4,7 @@ import chalk from 'chalk'
 import fs from 'fs/promises'
 import path from 'path'
 import inquirer from 'inquirer'
+import { SkillGenerator } from './skill-generator.js'
 
 console.log(chalk.blue('[INFO] SoulAI Skill Setup\n'))
 
@@ -123,27 +124,27 @@ async function initSkill() {
 
     const optimization = optimizations[plan]
 
-    // Read skill template (decode URL to handle spaces in path)
+    // Get project root (where SoulAI is installed)
     const scriptPath = decodeURIComponent(new URL(import.meta.url).pathname)
-    const templatePath = path.join(path.dirname(scriptPath), '..', 'templates', 'skill-template.md')
-    let skillContent = await fs.readFile(templatePath, 'utf8')
+    const projectRoot = path.resolve(path.dirname(scriptPath), '..')
 
-    // Replace template variables
-    skillContent = skillContent
-      .replace(/{{AI_NAME}}/g, aiName)
-      .replace(/{{AI_NAME_LOWER}}/g, aiNameLower)
-      .replace(/{{DESCRIPTION}}/g, description)
-      .replace(/{{PLAN}}/g, plan.toUpperCase())
-      .replace(/{{MAX_AGENTS}}/g, optimization.maxParallelAgents)
-      .replace(/{{TOKEN_BUDGET}}/g, optimization.tokenBudget.toLocaleString())
-      .replace(/{{CONTEXT_WINDOW}}/g, optimization.contextWindow)
-      .replace(/{{VERIFICATION_DEPTH}}/g, optimization.verificationDepth)
-      .replace(/{{VERSION}}/g, '1.0.0')
+    console.log(chalk.cyan('[INFO] Scanning submodules for skills...\n'))
+
+    // Generate dynamic skill.md from submodules
+    const generator = new SkillGenerator(projectRoot)
+    const skillContent = await generator.generate(aiName, plan, projectName, projectType)
 
     // Write skill.md
     const skillPath = path.join(skillDir, 'skill.md')
     await fs.writeFile(skillPath, skillContent)
     console.log(chalk.green(`[OK] Created ${skillPath}`))
+
+    // Generate MCP bridge configuration
+    console.log(chalk.cyan('[INFO] Generating MCP bridge configuration...\n'))
+    const bridge = await generator.generateMcpBridge(aiName)
+    const bridgePath = path.join(skillDir, 'mcp-bridge.json')
+    await fs.writeFile(bridgePath, JSON.stringify(bridge, null, 2))
+    console.log(chalk.green(`[OK] Created ${bridgePath}`))
 
     // Write config.json
     const config = {
@@ -168,14 +169,19 @@ async function initSkill() {
     await fs.mkdir(commandsDir, { recursive: true })
     console.log(chalk.green(`[OK] Created ${commandsDir}`))
 
+    // Get skill stats for success message
+    const stats = await generator.scanner.getStats()
+
     // Success message
     console.log(chalk.green(`\n[OK] ${aiName} skill installed successfully!\n`))
-    console.log(chalk.bold('Usage in Claude Code:'))
-    console.log(`  ${chalk.cyan(`/${aiNameLower} help`)}       - Show all commands`)
-    console.log(`  ${chalk.cyan(`/${aiNameLower} analyze`)}    - Analyze code`)
-    console.log(`  ${chalk.cyan(`/${aiNameLower} test`)}       - Generate tests`)
-    console.log(`  ${chalk.cyan(`/${aiNameLower} optimize`)}   - Optimize code`)
-    console.log(`  ${chalk.cyan(`/${aiNameLower} review`)}     - Review changes\n`)
+    console.log(chalk.bold(`Loaded ${stats.totalSkills} skills from ${stats.totalSubmodules} submodules\n`))
+    console.log(chalk.bold('Quick Start Commands:'))
+    console.log(`  ${chalk.cyan(`/${aiNameLower} help`)}        - Show all commands`)
+    console.log(`  ${chalk.cyan(`/${aiNameLower} debug`)}       - Systematic debugging`)
+    console.log(`  ${chalk.cyan(`/${aiNameLower} tdd`)}         - Test-driven development`)
+    console.log(`  ${chalk.cyan(`/${aiNameLower} brainstorm`)}  - Brainstorm solutions`)
+    console.log(`  ${chalk.cyan(`/${aiNameLower} plan`)}        - Write implementation plans`)
+    console.log(`  ${chalk.cyan(`/${aiNameLower} review`)}      - Request code review\n`)
 
     console.log(chalk.bold('Configuration:'))
     console.log(`  Plan: ${chalk.cyan(plan.toUpperCase())}`)
