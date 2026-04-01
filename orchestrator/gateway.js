@@ -11,7 +11,14 @@ export class Gateway {
    */
   buildToolMappings() {
     return {
-      // Superpowers tools
+      // Skills tools (unified across all submodules)
+      'list_skills': 'skills',
+      'get_skill': 'skills',
+      'search_skills': 'skills',
+      'get_skills_by_category': 'skills',
+      'refresh_cache': 'skills',
+
+      // Superpowers tools (legacy - use skills server instead)
       'tdd_start': 'superpowers',
       'debug_systematic': 'superpowers',
       'worktree_create': 'superpowers',

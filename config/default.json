@@ -8,6 +8,11 @@
     "contextWindow": "minimal"
   },
   "servers": {
+    "skills": {
+      "enabled": true,
+      "socketPath": "~/.soulai/sockets/skills.sock",
+      "projectRoot": "."
+    },
     "superpowers": {
       "enabled": true,
       "socketPath": "~/.soulai/sockets/superpowers.sock",

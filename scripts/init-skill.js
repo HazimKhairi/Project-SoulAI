@@ -5,6 +5,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import inquirer from 'inquirer'
 import { SkillGenerator } from './skill-generator.js'
+import { SubmoduleDownloader } from '../orchestrator/submodule-downloader.js'
 
 console.log(chalk.blue('[INFO] SoulAI Skill Setup\n'))
 
@@ -128,6 +129,18 @@ async function initSkill() {
     const scriptPath = decodeURIComponent(new URL(import.meta.url).pathname)
     const projectRoot = path.resolve(path.dirname(scriptPath), '..')
 
+    // Download submodules if needed
+    console.log(chalk.cyan('[INFO] Checking submodules...\n'))
+    const downloader = new SubmoduleDownloader(projectRoot)
+    const downloadResult = downloader.downloadAll()
+
+    if (!downloadResult.success) {
+      console.log(chalk.yellow('[WARNING] Some submodules failed to download'))
+      console.log(chalk.yellow('[WARNING] You may have reduced functionality\n'))
+    } else {
+      console.log(chalk.green('[OK] All submodules ready\n'))
+    }
+
     console.log(chalk.cyan('[INFO] Scanning submodules for skills...\n'))
 
     // Generate dynamic skill.md from submodules
@@ -156,6 +169,21 @@ async function initSkill() {
       project: {
         name: projectName,
         path: projectDir
+      },
+      features: {
+        autoCommit: {
+          enabled: true,
+          commitOnSuccess: true,
+          semanticMessages: true,
+          coAuthorTag: aiName,
+          failSafe: true,
+          logErrors: true
+        },
+        sessionLoader: {
+          enabled: true,
+          loadOnStartup: true,
+          includeDescriptions: true
+        }
       },
       createdAt: new Date().toISOString()
     }

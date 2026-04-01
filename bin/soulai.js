@@ -37,6 +37,33 @@ const commands = {
     })
   },
 
+  async update() {
+    // Update submodules
+    const updateScript = join(__dirname, '../scripts/update-submodules.js')
+    const child = spawn('node', [updateScript], {
+      stdio: 'inherit'
+    })
+
+    child.on('exit', (code) => {
+      process.exit(code)
+    })
+  },
+
+  async skill() {
+    // Execute skill
+    const skillName = process.argv[3]
+    const executeScript = join(__dirname, '../scripts/execute-skill.js')
+    const args = skillName ? [executeScript, skillName] : [executeScript]
+
+    const child = spawn('node', args, {
+      stdio: 'inherit'
+    })
+
+    child.on('exit', (code) => {
+      process.exit(code)
+    })
+  },
+
   async start() {
     console.log('[INFO] Starting SoulAI orchestrator...')
 
@@ -115,7 +142,12 @@ if (commands[command]) {
   console.log('Setup:')
   console.log('  soulai init                   - Setup skill in current project (RECOMMENDED)')
   console.log('  soulai init-global            - Global installation (legacy)')
+  console.log('  soulai update                 - Update submodules with latest skills')
   console.log('  soulai tokens                 - Update token usage tracking')
+  console.log('')
+  console.log('Skills:')
+  console.log('  soulai skill <name>           - Execute a skill (e.g., systematic-debugging)')
+  console.log('  soulai skill --search <query> - Search for skills')
   console.log('')
   console.log('Management:')
   console.log('  soulai start                  - Start orchestrator')
