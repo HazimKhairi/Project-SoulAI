@@ -7,14 +7,14 @@ describe('Git Submodules', () => {
   it('should have all required submodules defined', () => {
     const gitmodules = fs.readFileSync('.gitmodules', 'utf8')
 
-    // Currently working submodules (3 out of 5)
+    // Currently working submodules (4 out of 5)
+    expect(gitmodules).toContain('submodules/superpowers')
     expect(gitmodules).toContain('submodules/everything-claude-code')
     expect(gitmodules).toContain('submodules/ui-ux-pro-max-skill')
     expect(gitmodules).toContain('submodules/claude-mem')
 
     // TODO: Add when available:
-    // - submodules/superpowers (our own repo, currently empty)
-    // - submodules/mcp-context7 (repo not found)
+    // - submodules/mcp-context7 (repo not found at https://github.com/context7/mcp-server.git)
   })
 
   it('should initialize submodules on postinstall', async () => {

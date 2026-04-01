@@ -12,3 +12,6 @@
 	path = submodules/claude-mem
 	url = https://github.com/thedotmack/claude-mem.git
 	branch = main
+[submodule "submodules/superpowers"]
+	path = submodules/superpowers
+	url = https://github.com/obra/superpowers.git
