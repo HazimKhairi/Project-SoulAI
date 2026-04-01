@@ -16,16 +16,17 @@ SoulAI automatically commits your changes after each successful skill execution 
 - `tdd` → `test:` (test additions)
 - `brainstorm`, `plan` → `feat:` (new features)
 - `review` → `refactor:` (code improvements)
+- **Other skills** → `chore:` (default for unmapped skills)
 
 **Example:**
 ```bash
 /soulai debug  # Fixes bug in auth.js
-# Auto-commits: "fix: resolve authentication timeout in login flow
+# Auto-commits: "fix: resolve authentication timeout in login flow"
 #
 # Files changed:
 # - src/auth.js
 #
-# Co-authored-by: SoulAI <noreply@soulai.dev>"
+# Co-authored-by: SoulAI <noreply@soulai.dev>
 ```
 
 ## Configuration

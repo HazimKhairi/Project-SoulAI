@@ -14,14 +14,14 @@ Automatically loads all 161 skills from 4 submodules into Claude's context at se
 
 - **superpowers** (14 skills) - Development workflows
 - **everything-claude-code** (147 skills) - Professional skills
-- **ui-ux-pro-max-skill** (0 skills) - Design systems
-- **claude-mem** (0 skills) - Memory management
+- **ui-ux-pro-max-skill** (coming soon) - Design systems
+- **claude-mem** (coming soon) - Memory management
 
 ## Token Cost
 
 - **Startup load:** ~5-8K tokens (one-time)
 - **Per skill invocation:** 0 tokens (already loaded)
-- **Total savings:** 40-60% fewer tokens per task
+- **Total savings:** 20-60% fewer tokens per task (varies by skill type: debug=60%, TDD=35%, brainstorm=25%, review=20%)
 
 ## Configuration
 
@@ -67,9 +67,10 @@ everything-claude-code (147 skills):
 
 If submodule loading fails:
 
-1. Logs error message
-2. Loads basic skill set (superpowers only)
-3. Session continues with limited skills
+1. Logs error message with [ERROR] prefix to console
+2. Loads basic skill set (14 superpowers skills only)
+3. Session continues with limited skills (161 → 14 skills available)
+4. Retains core functionality: debug, tdd, brainstorm, plan, review, etc.
 
 ## Disabling Session Loader
 
@@ -83,4 +84,4 @@ If submodule loading fails:
 }
 ```
 
-**Note:** Disabling loses 40-60% token savings benefit.
+**Note:** Disabling loses 20-60% token savings benefit (varies by skill type).
