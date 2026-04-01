@@ -460,8 +460,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 [![GitHub](https://img.shields.io/badge/GitHub-HazimKhairi-181717?style=flat-square&logo=github)](https://github.com/HazimKhairi)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=flat-square&logo=discord&logoColor=white)](#)
 
-**Built with ❤️ using Claude Code**
-
 </div>
 
 ---
