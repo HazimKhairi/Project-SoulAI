@@ -1,0 +1,5 @@
+# Git submodules will be added in next task
+# Format:
+# [submodule "submodules/superpowers"]
+#   path = submodules/superpowers
+#   url = https://github.com/HazimKhairi/Project-SoulAI.git
