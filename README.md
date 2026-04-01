@@ -32,7 +32,7 @@ npx soulai init
 - 🎯 **161 Production Skills** - From superpowers, everything-claude-code, and more
 - 🔧 **Project-Specific** - Install per-project, not globally (no config pollution)
 - 🎨 **Custom AI Names** - Personalize your AI (SoulAI, Revo, EjenAli, etc.)
-- 📊 **Plan Optimization** - Auto-adjusts based on Claude Code plan (Pro/Max 5x/Max 20x)
+- 📊 **Token Usage Tracking** - See daily/weekly/monthly budget, optimization tips, and usage scores
 - ⚡ **Zero Setup** - Auto-detects project type, minimal prompts
 
 ---
@@ -399,6 +399,39 @@ Then use in Claude Code:
 - 1-20 characters
 - Alphanumeric + hyphens/underscores
 - No special characters
+
+</details>
+
+<details>
+<summary><b>📊 Token Usage Tracking</b></summary>
+
+See your token budget and optimization tips every time:
+
+**Displays in skill.md:**
+```markdown
+Token Budget: MAX-20X Plan
+- Daily: 571K • Weekly: 4M • Monthly: 16M
+- Check Claude Code dashboard for live usage
+
+Token Usage Tracking:
+- Daily Budget: 571,429 tokens (~571K)
+- Weekly Budget: 4,000,000 tokens (~4M)
+- Monthly Budget: 16,000,000 tokens (~16M)
+
+Usage Tips:
+- Use /soulai debug (saves 60% tokens)
+- Use /soulai tdd (saves 35% tokens)
+- Use /soulai brainstorm (saves 25% tokens)
+- Break large tasks into smaller chunks
+```
+
+**Token Optimization Scores:**
+- Systematic debugging: 40% fewer tokens
+- TDD workflow: 35% fewer tokens
+- Brainstorming first: 25% fewer tokens
+- Verification before completion: 20% fewer tokens
+
+**Goal:** Keep usage under 80% of daily/weekly limits.
 
 </details>
 

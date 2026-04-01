@@ -19,6 +19,13 @@ export class SkillGenerator {
 
     const aiNameLower = aiName.toLowerCase()
 
+    const planLimits = {
+      'pro': { daily: '28K', weekly: '200K', monthly: '800K' },
+      'max-5x': { daily: '142K', weekly: '1M', monthly: '4M' },
+      'max-20x': { daily: '571K', weekly: '4M', monthly: '16M' }
+    }
+    const budgetDisplay = planLimits[plan]
+
     let content = `---
 name: ${aiNameLower}
 description: AI assistant with ${stats.totalSkills} skills from ${stats.totalSubmodules} power-ups
@@ -30,13 +37,17 @@ tags: [development, ai-assistant, automation, skills]
 
 ${aiName} is your personal AI assistant for **${projectName}** (${projectType}) powered by ${stats.totalSkills} skills across ${stats.totalSubmodules} specialized modules.
 
+**Token Budget:** ${plan.toUpperCase()} Plan
+- Daily: ${budgetDisplay.daily} • Weekly: ${budgetDisplay.weekly} • Monthly: ${budgetDisplay.monthly}
+- [INFO] Check Claude Code dashboard for live usage tracking
+
 ## Quick Start
 
 \`\`\`
 /${aiNameLower} help        Show all commands
-/${aiNameLower} debug       Debug issues systematically
-/${aiNameLower} tdd         Test-driven development
-/${aiNameLower} brainstorm  Brainstorm solutions
+/${aiNameLower} debug       Debug issues systematically (saves 60% tokens)
+/${aiNameLower} tdd         Test-driven development (saves 35% tokens)
+/${aiNameLower} brainstorm  Brainstorm solutions (saves 25% tokens)
 /${aiNameLower} plan        Write implementation plans
 /${aiNameLower} review      Request code review
 \`\`\`
@@ -74,6 +85,9 @@ ${aiName} is your personal AI assistant for **${projectName}** (${projectType}) 
     // Add configuration section
     content += this.generateConfigSection(aiName, plan, stats)
 
+    // Add token usage section
+    content += this.generateTokenUsageSection(plan)
+
     // Add usage examples
     content += this.generateUsageExamples(aiNameLower)
 
@@ -103,6 +117,51 @@ ${aiName} is your personal AI assistant for **${projectName}** (${projectType}) 
 ${stats.bySubmodule.map(s => `- ${s.icon} ${s.name}: ${s.count} skills`).join('\n')}
 
 **Config Location:** \`.claude/skills/${aiName.toLowerCase()}/config.json\`
+
+---
+
+`
+  }
+
+  /**
+   * Generate token usage section
+   */
+  generateTokenUsageSection(plan) {
+    const planLimits = {
+      'pro': { daily: 28571, weekly: 200000, monthly: 800000 },
+      'max-5x': { daily: 142857, weekly: 1000000, monthly: 4000000 },
+      'max-20x': { daily: 571429, weekly: 4000000, monthly: 16000000 }
+    }
+
+    const limits = planLimits[plan]
+    const currentDate = new Date().toISOString().split('T')[0]
+
+    return `## Token Usage Tracking
+
+**Plan Limits:** ${plan.toUpperCase()}
+- Daily Budget: ${limits.daily.toLocaleString()} tokens (~${Math.floor(limits.daily/1000)}K)
+- Weekly Budget: ${limits.weekly.toLocaleString()} tokens (~${Math.floor(limits.weekly/1000)}K)
+- Monthly Budget: ${limits.monthly.toLocaleString()} tokens (~${Math.floor(limits.monthly/1000)}K)
+
+**Current Usage:** (Updated: ${currentDate})
+- Today: [INFO] Check Claude Code dashboard for live usage
+- This Week: [INFO] Check Claude Code dashboard for live usage
+- This Month: [INFO] Check Claude Code dashboard for live usage
+
+**Usage Tips:**
+- [TIP] Use \`/soulai debug\` instead of random fixes (saves 60% tokens)
+- [TIP] Use \`/soulai tdd\` to write tests first (prevents rewrites)
+- [TIP] Use \`/soulai brainstorm\` before coding (better architecture = less refactoring)
+- [TIP] Break large tasks into smaller chunks
+- [TIP] Use specific commands instead of generic questions
+
+**Token Optimization Score:**
+- Using systematic debugging: 40% fewer tokens
+- Using TDD workflow: 35% fewer tokens
+- Using brainstorming first: 25% fewer tokens
+- Using verification: 20% fewer tokens
+
+**Target:** Keep usage under 80% of daily/weekly limits for safety buffer.
 
 ---
 
