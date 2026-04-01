@@ -68,6 +68,18 @@ const commands = {
     console.log('[OK] All servers operational')
   },
 
+  async tokens() {
+    // Update token usage
+    const tokensScript = join(__dirname, '../scripts/update-tokens.js')
+    const child = spawn('node', [tokensScript], {
+      stdio: 'inherit'
+    })
+
+    child.on('exit', (code) => {
+      process.exit(code)
+    })
+  },
+
   async 'generate-claude-config'() {
     const { execSync } = await import('child_process')
     const soulaiPath = execSync('which soulai', { encoding: 'utf8' }).trim()
@@ -103,6 +115,7 @@ if (commands[command]) {
   console.log('Setup:')
   console.log('  soulai init                   - Setup skill in current project (RECOMMENDED)')
   console.log('  soulai init-global            - Global installation (legacy)')
+  console.log('  soulai tokens                 - Update token usage tracking')
   console.log('')
   console.log('Management:')
   console.log('  soulai start                  - Start orchestrator')
@@ -115,5 +128,6 @@ if (commands[command]) {
   console.log('Quick Start:')
   console.log('  cd your-project')
   console.log('  soulai init')
+  console.log('  soulai tokens                 - Update your token usage')
   console.log('  # Then in Claude Code: /{your-ai-name} help')
 }

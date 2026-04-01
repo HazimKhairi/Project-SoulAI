@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { SkillScanner } from './skill-scanner.js'
+import { TokenUsageReader } from './token-usage-reader.js'
 
 /**
  * Generate skill.md from scanned submodules
@@ -86,7 +87,7 @@ ${aiName} is your personal AI assistant for **${projectName}** (${projectType}) 
     content += this.generateConfigSection(aiName, plan, stats)
 
     // Add token usage section
-    content += this.generateTokenUsageSection(plan)
+    content += await this.generateTokenUsageSection(plan)
 
     // Add usage examples
     content += this.generateUsageExamples(aiNameLower)
@@ -126,7 +127,7 @@ ${stats.bySubmodule.map(s => `- ${s.icon} ${s.name}: ${s.count} skills`).join('\
   /**
    * Generate token usage section
    */
-  generateTokenUsageSection(plan) {
+  async generateTokenUsageSection(plan) {
     const planLimits = {
       'pro': { daily: 28571, weekly: 200000, monthly: 800000 },
       'max-5x': { daily: 142857, weekly: 1000000, monthly: 4000000 },
@@ -136,6 +137,11 @@ ${stats.bySubmodule.map(s => `- ${s.icon} ${s.name}: ${s.count} skills`).join('\
     const limits = planLimits[plan]
     const currentDate = new Date().toISOString().split('T')[0]
 
+    // Try to get current usage
+    const reader = new TokenUsageReader()
+    const currentUsage = await reader.getCurrentUsage()
+    const formatted = reader.formatUsage(currentUsage, limits)
+
     return `## Token Usage Tracking
 
 **Plan Limits:** ${plan.toUpperCase()}
@@ -144,10 +150,15 @@ ${stats.bySubmodule.map(s => `- ${s.icon} ${s.name}: ${s.count} skills`).join('\
 - Monthly Budget: ${limits.monthly.toLocaleString()} tokens (~${Math.floor(limits.monthly/1000)}K)
 
 **Current Usage:** (Updated: ${currentDate})
-- Today: [INFO] Check Claude Code dashboard for live usage
-- This Week: [INFO] Check Claude Code dashboard for live usage
-- This Month: [INFO] Check Claude Code dashboard for live usage
+- Today: ${formatted.daily}
+- This Week: ${formatted.weekly}
+- This Month: ${formatted.monthly}
 
+${currentUsage ? '' : `[INFO] Auto-detection failed. Update manually:
+\`\`\`bash
+node scripts/token-usage-reader.js update <daily> <weekly> <monthly>
+\`\`\`
+`}
 **Usage Tips:**
 - [TIP] Use \`/soulai debug\` instead of random fixes (saves 60% tokens)
 - [TIP] Use \`/soulai tdd\` to write tests first (prevents rewrites)
