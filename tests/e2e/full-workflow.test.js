@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { McpServer } from '../../orchestrator/mcp-server.js'
 import { GitHelper } from '../../orchestrator/git-helper.js'
+import { CommitMiddleware } from '../../orchestrator/middleware/commit-middleware.js'
 import fs from 'fs/promises'
 import path from 'path'
 import { exec } from 'child_process'
