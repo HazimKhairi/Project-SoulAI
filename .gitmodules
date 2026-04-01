@@ -15,3 +15,6 @@
 [submodule "submodules/superpowers"]
 	path = submodules/superpowers
 	url = https://github.com/obra/superpowers.git
+[submodule "submodules/context7"]
+	path = submodules/context7
+	url = https://github.com/upstash/context7.git
