@@ -63,9 +63,17 @@ export class GitHelper {
     }
 
     try {
-      const addCmd = files ? `git add ${files.join(' ')}` : 'git add .'
-      await execAsync(addCmd, { cwd: this.projectDir })
-      await execAsync(`git commit -m "${message}"`, { cwd: this.projectDir })
+      if (files) {
+        // Escape each file path to prevent injection
+        const escapedFiles = files.map(f => `"${f.replace(/"/g, '\\"')}"`)
+        await execAsync(`git add ${escapedFiles.join(' ')}`, { cwd: this.projectDir })
+      } else {
+        await execAsync('git add .', { cwd: this.projectDir })
+      }
+
+      // Use heredoc to safely pass commit message and prevent injection
+      const commitCmd = `git commit -m "$(cat <<'EOF'\n${message}\nEOF\n)"`
+      await execAsync(commitCmd, { cwd: this.projectDir })
       return true
     } catch {
       return false

@@ -104,4 +104,45 @@ describe('GitHelper', () => {
     const tmpHelper = new GitHelper('/tmp')
     expect(await tmpHelper.isGitRepo()).toBe(false)
   })
+
+  test('commits specific files when provided', async () => {
+    await fs.mkdir(TEST_REPO_DIR, { recursive: true })
+    await execAsync('git init', { cwd: TEST_REPO_DIR })
+    await execAsync('git config user.email "test@test.com"', { cwd: TEST_REPO_DIR })
+    await execAsync('git config user.name "Test"', { cwd: TEST_REPO_DIR })
+
+    // Create two files
+    await fs.writeFile(path.join(TEST_REPO_DIR, 'file1.txt'), 'content1')
+    await fs.writeFile(path.join(TEST_REPO_DIR, 'file2.txt'), 'content2')
+
+    const helper = new GitHelper(TEST_REPO_DIR)
+
+    // Commit only file1.txt
+    const result = await helper.commit('Add file1', ['file1.txt'])
+    expect(result).toBe(true)
+
+    // Verify file2.txt is still uncommitted
+    const status = await execAsync('git status --porcelain', { cwd: TEST_REPO_DIR })
+    expect(status.stdout).toContain('file2.txt')
+  })
+
+  test('safely handles commit messages with quotes and special chars', async () => {
+    await fs.mkdir(TEST_REPO_DIR, { recursive: true })
+    await execAsync('git init', { cwd: TEST_REPO_DIR })
+    await execAsync('git config user.email "test@test.com"', { cwd: TEST_REPO_DIR })
+    await execAsync('git config user.name "Test"', { cwd: TEST_REPO_DIR })
+
+    await fs.writeFile(path.join(TEST_REPO_DIR, 'test.txt'), 'content')
+
+    const helper = new GitHelper(TEST_REPO_DIR)
+
+    // Try message with dangerous characters
+    const dangerousMessage = 'feat: add "quoted" feature\nWith newline\nAnd `backticks`'
+    const result = await helper.commit(dangerousMessage)
+    expect(result).toBe(true)
+
+    // Verify commit message was stored correctly
+    const log = await execAsync('git log -1 --pretty=%B', { cwd: TEST_REPO_DIR })
+    expect(log.stdout).toContain('feat: add "quoted" feature')
+  })
 })
