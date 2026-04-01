@@ -32,7 +32,7 @@ soulai start
 - 🎯 **Multi-Server Architecture** - 5 independent MCP servers via Unix sockets
 - 🛡️ **Anti-Hallucination System** - 11-component verification (5 validators + 3 strategies + 3 guardrails)
 - 🔄 **Auto-Recovery** - Crashed servers restart automatically (max 3 retries)
-- 📊 **Plan Optimization** - Auto-adjusts based on Claude plan (Free/Pro/Team/Enterprise)
+- 📊 **Plan Optimization** - Auto-adjusts based on Claude Code plan (Pro/Max 5x/Max 20x)
 - 🎨 **Custom AI Names** - Personalize your AI (SoulAI, Revo, EjenAli, etc.)
 
 ---
@@ -200,29 +200,33 @@ graph LR
 
 ## 📊 Plan Optimization
 
-SoulAI automatically adjusts resources based on your Claude plan:
+SoulAI automatically adjusts resources based on your Claude Code plan:
 
 <div align="center">
 
-| Plan | Max Agents | Token Budget | Context Window |
-|------|-----------|--------------|----------------|
-| **Free** | 1 | 50K | Minimal |
-| **Pro** | 2 | 150K | Medium |
-| **Team** ⭐ | 5 | 500K | Large |
-| **Enterprise** | 10 | 2M | Unlimited |
+| Plan | Price | Max Agents | Token Budget | Context Window |
+|------|-------|-----------|--------------|----------------|
+| **Pro** | $20/mo | 3 | 200K | High |
+| **Max 5x** ⭐ | $100/mo | 8 | 1M | Very High |
+| **Max 20x** 🚀 | $200/mo | 20 | 4M | Unlimited |
 
 </div>
+
+**Note:** Pricing is for Claude Code individual subscription plans as of 2026.
+- **Pro**: High usage limits for personal projects
+- **Max 5x**: 5x usage limits for heavy development
+- **Max 20x**: 20x usage limits for full-time agentic workflows
 
 ### Configuration
 
 ```json
 {
   "aiName": "MyAI",
-  "plan": "team",
+  "plan": "max-5x",
   "optimization": {
-    "maxAgents": 5,
-    "tokenBudget": 500000,
-    "contextWindow": "large"
+    "maxAgents": 8,
+    "tokenBudget": 1000000,
+    "contextWindow": "very-high"
   }
 }
 ```

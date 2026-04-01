@@ -20,9 +20,35 @@ async function initSkill() {
     const projectDir = process.cwd()
     const projectName = path.basename(projectDir)
 
-    console.log(chalk.cyan(`Setting up SoulAI for: ${chalk.bold(projectName)}\n`))
+    // Auto-detect project info
+    let projectType = 'web'
+    let projectDescription = `AI assistant for ${projectName}`
 
-    // Ask user preferences
+    try {
+      const packageJsonPath = path.join(projectDir, 'package.json')
+      const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
+      projectDescription = packageJson.description || projectDescription
+
+      // Detect project type
+      if (packageJson.dependencies?.['react'] || packageJson.dependencies?.['next']) {
+        projectType = 'React/Next.js'
+      } else if (packageJson.dependencies?.['vue']) {
+        projectType = 'Vue'
+      } else if (packageJson.dependencies?.['@angular/core']) {
+        projectType = 'Angular'
+      } else if (packageJson.dependencies?.['express']) {
+        projectType = 'Node.js/Express'
+      } else if (packageJson.dependencies?.['flutter']) {
+        projectType = 'Flutter'
+      }
+    } catch {
+      // No package.json, use defaults
+    }
+
+    console.log(chalk.cyan(`Setting up SoulAI for: ${chalk.bold(projectName)}`))
+    console.log(chalk.gray(`Project type: ${projectType}\n`))
+
+    // Ask user preferences (ONLY name and plan)
     const answers = await inquirer.prompt([
       {
         type: 'input',
@@ -43,25 +69,19 @@ async function initSkill() {
         }
       },
       {
-        type: 'input',
-        name: 'description',
-        message: 'Describe your AI assistant:',
-        default: 'My personal AI development partner'
-      },
-      {
         type: 'list',
         name: 'plan',
-        message: 'Which Claude plan are you using?',
+        message: 'Which Claude Code plan are you using?',
         choices: [
-          { name: 'Free ($0/month)', value: 'free' },
-          { name: 'Pro ($20/month)', value: 'pro' },
-          { name: 'Team ($25-30/month)', value: 'team' },
-          { name: 'Enterprise (Custom)', value: 'enterprise' }
+          { name: 'Pro ($20/month) - High usage limits', value: 'pro' },
+          { name: 'Max 5x ($100/month) - 5x usage limits', value: 'max-5x' },
+          { name: 'Max 20x ($200/month) - 20x usage limits for heavy workflows', value: 'max-20x' }
         ]
       }
     ])
 
-    const { aiName, description, plan } = answers
+    const { aiName, plan } = answers
+    const description = `AI assistant for ${projectName} (${projectType})`
     const aiNameLower = aiName.toLowerCase()
 
     // Create skill directory structure
@@ -72,44 +92,40 @@ async function initSkill() {
 
     // Generate optimization config based on plan
     const optimizations = {
-      free: {
-        maxParallelAgents: 1,
-        contextWindow: 'minimal',
-        verificationDepth: 'basic',
-        maxMemoryEntries: 10,
-        tokenBudget: 50000,
-        batchSize: 5
-      },
       pro: {
-        maxParallelAgents: 2,
-        contextWindow: 'medium',
+        maxParallelAgents: 3,
+        contextWindow: 'high',
         verificationDepth: 'standard',
-        maxMemoryEntries: 50,
-        tokenBudget: 150000,
-        batchSize: 10
+        maxMemoryEntries: 100,
+        tokenBudget: 200000,
+        batchSize: 15,
+        description: 'High usage limits - ideal for personal projects'
       },
-      team: {
-        maxParallelAgents: 5,
-        contextWindow: 'large',
+      'max-5x': {
+        maxParallelAgents: 8,
+        contextWindow: 'very-high',
         verificationDepth: 'comprehensive',
-        maxMemoryEntries: 200,
-        tokenBudget: 500000,
-        batchSize: 25
+        maxMemoryEntries: 500,
+        tokenBudget: 1000000,
+        batchSize: 40,
+        description: '5x usage limits - for heavy development work'
       },
-      enterprise: {
-        maxParallelAgents: 10,
+      'max-20x': {
+        maxParallelAgents: 20,
         contextWindow: 'unlimited',
         verificationDepth: 'exhaustive',
-        maxMemoryEntries: 1000,
-        tokenBudget: 2000000,
-        batchSize: 50
+        maxMemoryEntries: 2000,
+        tokenBudget: 4000000,
+        batchSize: 100,
+        description: '20x usage limits - full-time agentic workflows'
       }
     }
 
     const optimization = optimizations[plan]
 
-    // Read skill template
-    const templatePath = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'templates', 'skill-template.md')
+    // Read skill template (decode URL to handle spaces in path)
+    const scriptPath = decodeURIComponent(new URL(import.meta.url).pathname)
+    const templatePath = path.join(path.dirname(scriptPath), '..', 'templates', 'skill-template.md')
     let skillContent = await fs.readFile(templatePath, 'utf8')
 
     // Replace template variables
