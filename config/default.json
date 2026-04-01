@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "aiName": "SoulAI",
+  "plan": "free",
+  "optimization": {
+    "maxAgents": 1,
+    "tokenBudget": 50000,
+    "contextWindow": "minimal"
+  },
+  "servers": {
+    "superpowers": {
+      "enabled": true,
+      "socketPath": "~/.soulai/sockets/superpowers.sock",
+      "submodulePath": "./submodules/superpowers"
+    },
+    "claude-code": {
+      "enabled": true,
+      "socketPath": "~/.soulai/sockets/claude-code.sock",
+      "submodulePath": "./submodules/everything-claude-code"
+    },
+    "design": {
+      "enabled": true,
+      "socketPath": "~/.soulai/sockets/design.sock",
+      "submodulePath": "./submodules/ui-ux-pro-max-skill"
+    },
+    "memory": {
+      "enabled": true,
+      "socketPath": "~/.soulai/sockets/memory.sock",
+      "storagePath": "~/.soulai/memory"
+    },
+    "search": {
+      "enabled": true,
+      "socketPath": "~/.soulai/sockets/search.sock"
+    },
+    "verification": {
+      "enabled": true,
+      "socketPath": "~/.soulai/sockets/verification.sock"
+    }
+  },
+  "verification": {
+    "confidenceThreshold": 0.7,
+    "hallucinationThreshold": 0.3,
+    "autoApproveThreshold": 0.9
+  },
+  "logging": {
+    "level": "info",
+    "file": "~/.soulai/logs/soulai.log"
+  }
+}
