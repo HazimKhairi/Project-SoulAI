@@ -213,6 +213,15 @@ describe('Full Workflow E2E', () => {
     // Execute first 3 skills (or less if not available)
     const skillsToTest = skillIndex.slice(0, Math.min(3, skillIndex.length))
 
+    const gitHelperForTest = new GitHelper(testDir)
+    const testCommitMiddleware = new CommitMiddleware({
+      enabled: true,
+      commitOnSuccess: true,
+      semanticMessages: true,
+      coAuthorTag: 'TestAI',
+      failSafe: true
+    }, gitHelperForTest)
+
     for (const skill of skillsToTest) {
       // Make a unique change for each skill
       const fileName = `test-${skill.command}.js`
@@ -229,10 +238,9 @@ describe('Full Workflow E2E', () => {
       }
 
       // Auto-commit
-      await mcpServer.commitMiddleware.handle(result)
+      await testCommitMiddleware.handle(result)
 
       // Verify commit created
-      const gitHelperForTest = new GitHelper(testDir)
       expect(await gitHelperForTest.hasUncommittedChanges()).toBe(false)
     }
 
