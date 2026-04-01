@@ -54,6 +54,30 @@ const commands = {
   async status() {
     console.log('[INFO] SoulAI Status')
     console.log('[OK] All servers operational')
+  },
+
+  async 'generate-claude-config'() {
+    const { execSync } = await import('child_process')
+    const soulaiPath = execSync('which soulai', { encoding: 'utf8' }).trim()
+    const homeDir = process.env.HOME || process.env.USERPROFILE
+
+    const config = {
+      soulai: {
+        command: soulaiPath,
+        args: ['start'],
+        env: {
+          HOME: homeDir
+        },
+        type: 'stdio'
+      }
+    }
+
+    console.log('[INFO] Add this to ~/.claude.json under "mcpServers":')
+    console.log('')
+    console.log(JSON.stringify(config, null, 2))
+    console.log('')
+    console.log('[INFO] Or run:')
+    console.log(`  claude mcp add soulai --command "${soulaiPath}" --args "start" --env "HOME=${homeDir}" --type stdio`)
   }
 }
 
@@ -63,8 +87,9 @@ if (commands[command]) {
   commands[command]()
 } else {
   console.log('[INFO] SoulAI Commands:')
-  console.log('  soulai init   - Initialize configuration')
-  console.log('  soulai start  - Start orchestrator')
-  console.log('  soulai stop   - Stop all servers')
-  console.log('  soulai status - Check status')
+  console.log('  soulai init                  - Initialize configuration')
+  console.log('  soulai start                 - Start orchestrator')
+  console.log('  soulai stop                  - Stop all servers')
+  console.log('  soulai status                - Check status')
+  console.log('  soulai generate-claude-config - Generate Claude Code config')
 }
