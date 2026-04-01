@@ -4,10 +4,10 @@
 
   # 🤖 SoulAI
 
-  **Open-source workflow agent combining 5 MCP servers with anti-hallucination guarantees**
+  **Skill-based workflow agent for Claude Code with 161 battle-tested skills**
 
-  [![Tests](https://img.shields.io/badge/tests-86%20passing-brightgreen?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
-  [![Coverage](https://img.shields.io/badge/coverage-85%25-green?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
+  [![Skills](https://img.shields.io/badge/skills-161-blue?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
+  [![Submodules](https://img.shields.io/badge/submodules-4-green?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
   [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
   [![Node](https://img.shields.io/badge/node-18%2B-brightgreen?style=flat-square)](https://nodejs.org)
   [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
@@ -20,62 +20,149 @@
 
 ## 🌟 What is SoulAI?
 
-**SoulAI** is a multi-server orchestrator that combines 5 independent submodules into a unified workflow agent. The sweet spot between **low-code automation** and **enterprise-grade reliability**.
+**SoulAI** is a skill-based workflow agent for Claude Code that combines **161 battle-tested skills** from 4 specialized submodules. Get systematic debugging, test-driven development, code review, and more — all in your project with one command.
 
 ```bash
-npm install -g soulai
-soulai start
+cd your-project
+npx soulai init
 ```
 
 ### Key Features
 
-- 🎯 **Multi-Server Architecture** - 5 independent MCP servers via Unix sockets
-- 🛡️ **Anti-Hallucination System** - 11-component verification (5 validators + 3 strategies + 3 guardrails)
-- 🔄 **Auto-Recovery** - Crashed servers restart automatically (max 3 retries)
-- 📊 **Plan Optimization** - Auto-adjusts based on Claude Code plan (Pro/Max 5x/Max 20x)
+- 🎯 **161 Production Skills** - From superpowers, everything-claude-code, and more
+- 🔧 **Project-Specific** - Install per-project, not globally (no config pollution)
 - 🎨 **Custom AI Names** - Personalize your AI (SoulAI, Revo, EjenAli, etc.)
+- 📊 **Plan Optimization** - Auto-adjusts based on Claude Code plan (Pro/Max 5x/Max 20x)
+- ⚡ **Zero Setup** - Auto-detects project type, minimal prompts
+
+---
+
+## 📚 Skill System
+
+SoulAI dynamically scans submodules to give you **161 battle-tested skills**:
+
+<div align="center">
+
+| Submodule | Skills | Highlights |
+|-----------|--------|------------|
+| **🦸 Superpowers** | 14 | TDD, Systematic Debugging, Git Worktrees, Code Review |
+| **💻 Everything Claude Code** | 147 | Token Optimization, Parallel Agents, Build Fixes |
+| **🎨 UI/UX Pro Max** | 0 | Design Systems, Stitch Integration (coming soon) |
+| **🧠 Claude Mem** | 0 | Persistent Memory (coming soon) |
+
+</div>
+
+### Top Skills
+
+```bash
+/soulai debug          # Systematic root-cause debugging
+/soulai tdd            # Test-driven development workflow
+/soulai brainstorm     # Creative problem-solving
+/soulai plan           # Implementation planning
+/soulai review         # Code review automation
+/soulai parallel       # Dispatch parallel agents
+/soulai fix-review     # Handle review feedback
+/soulai verify         # Verification before completion
+/soulai git-worktree   # Git worktree workflows
+/soulai finish         # Finish development branch
+```
+
+**And 151 more!** Type `/soulai help` in Claude Code to see all commands.
 
 ---
 
 ## 🏗️ Architecture
 
+### Current: Skill-Based System (Phase 1 ✅)
+
 <div align="center">
 
 ```mermaid
 graph TB
-    Claude[Claude Code CLI] --> Gateway[Gateway Router]
+    User[User runs: soulai init] --> Scanner[Skill Scanner]
+    Scanner --> Sub1[submodules/superpowers/skills/*]
+    Scanner --> Sub2[submodules/everything-claude-code/skills/*]
+    Scanner --> Sub3[submodules/ui-ux-pro-max-skill/skills/*]
+    Scanner --> Sub4[submodules/claude-mem/skills/*]
 
-    Gateway --> IPC1[IPC Client]
-    Gateway --> IPC2[IPC Client]
-    Gateway --> IPC3[IPC Client]
-    Gateway --> IPC4[IPC Client]
-    Gateway --> IPC5[IPC Client]
+    Sub1 --> Gen[Skill Generator]
+    Sub2 --> Gen
+    Sub3 --> Gen
+    Sub4 --> Gen
 
-    IPC1 --> S1[🦸 Superpowers<br/>TDD, Debugging, Git]
-    IPC2 --> S2[💻 Claude Code<br/>Token Optimization]
-    IPC3 --> S3[🎨 Design<br/>UI/UX, Stitch]
-    IPC4 --> S4[🧠 Memory<br/>Persistent Storage]
-    IPC5 --> S5[🔍 Search<br/>Web, Docs, GitHub]
+    Gen --> Out1[skill.md<br/>161 skills]
+    Gen --> Out2[mcp-bridge.json<br/>161 commands]
 
-    S1 --> V[Verification Layer]
-    S2 --> V
-    S3 --> V
-    S4 --> V
-    S5 --> V
+    Out1 --> Claude[Claude Code]
+    Claude --> Cmd[/soulai debug]
+    Cmd --> Exec[Execute skill content]
 
-    V --> V1[File Validator]
-    V --> V2[Code Validator]
-    V --> V3[Git Validator]
-    V --> S1
-
-    style Claude fill:#4A90E2,stroke:#2E5C8A,color:#fff
-    style Gateway fill:#50C878,stroke:#2E7D4E,color:#fff
-    style V fill:#FF6B6B,stroke:#C44545,color:#fff
+    style User fill:#4A90E2,stroke:#2E5C8A,color:#fff
+    style Scanner fill:#50C878,stroke:#2E7D4E,color:#fff
+    style Gen fill:#FFA500,stroke:#CC8400,color:#fff
+    style Out1 fill:#9B59B6,stroke:#7D3C98,color:#fff
+    style Out2 fill:#9B59B6,stroke:#7D3C98,color:#fff
 ```
 
 </div>
 
-### 🎯 Server Ecosystem
+### Future: MCP Server Integration (Phase 2 🚧)
+
+<div align="center">
+
+```mermaid
+graph TB
+    Claude[Claude Code] --> CMD[/soulai debug]
+    CMD --> Bridge[MCP Bridge]
+    Bridge --> Server[MCP Server]
+
+    Server --> Tool[execute_skill tool]
+    Tool --> File[Read skill file]
+    File --> Sub[submodules/superpowers/skills/systematic-debugging/SKILL.md]
+
+    Sub --> Exec[Execute skill content]
+    Exec --> Claude
+
+    style Claude fill:#4A90E2,stroke:#2E5C8A,color:#fff
+    style Bridge fill:#FFA500,stroke:#CC8400,color:#fff
+    style Server fill:#50C878,stroke:#2E7D4E,color:#fff
+    style Sub fill:#9B59B6,stroke:#7D3C98,color:#fff
+```
+
+**Status:** Coming in Phase 2
+
+</div>
+
+## 🎯 Implementation Status
+
+<div align="center">
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| **Phase 1** | ✅ Complete | Skill scanning, generation, integration |
+| **Phase 2** | 🚧 In Progress | MCP server for skill execution |
+| **Phase 3** | 📋 Planned | Anti-hallucination verification layer |
+| **Phase 4** | 📋 Planned | Auto-recovery and monitoring |
+
+</div>
+
+### ✅ Phase 1: Skill System (Complete)
+
+- [x] Skill scanner (`scripts/skill-scanner.js`)
+- [x] Skill generator (`scripts/skill-generator.js`)
+- [x] Integration into init (`scripts/init-skill.js`)
+- [x] 161 skills from 4 submodules
+- [x] MCP bridge configuration
+- [x] Project-specific installation
+
+### 🚧 Phase 2: MCP Server (In Progress)
+
+- [ ] MCP server implementation
+- [ ] Skill execution engine
+- [ ] Command routing (skill.md → MCP → submodule files)
+- [ ] End-to-end testing
+
+### 🎯 Submodule Ecosystem
 
 <table>
   <tr>
@@ -109,92 +196,54 @@ graph TB
 ### Installation
 
 ```bash
-# Clone repository
-git clone https://github.com/HazimKhairi/Project-SoulAI.git
-cd Project-SoulAI
+# In your project directory
+cd your-project
 
-# Install dependencies
-npm install
-
-# Install globally
-npm link
-
-# Initialize configuration
-soulai init
+# Install SoulAI (one-time setup)
+npx soulai init
 ```
 
-### Usage
+**That's it!** SoulAI will:
+- Auto-detect your project type (React, Node.js, Vue, etc.)
+- Scan 4 submodules for 161 skills
+- Create `.claude/skills/{your-ai-name}/skill.md`
+- Generate MCP bridge with 161 command mappings
+
+### Usage in Claude Code
 
 ```bash
-# Start SoulAI orchestrator
-soulai start
+# Systematic debugging
+/soulai debug
 
-# Check server status
-soulai status
+# Test-driven development
+/soulai tdd
 
-# Stop all servers
-soulai stop
+# Brainstorm solutions
+/soulai brainstorm
+
+# Write implementation plan
+/soulai plan
+
+# Request code review
+/soulai review
+
+# ... and 156 more skills!
 ```
 
 ### Example: Test-Driven Development
 
 ```javascript
 // In Claude Code
-claude> Use TDD workflow to implement user authentication
+You: "Implement user authentication"
 
-// SoulAI orchestrates:
-// 1. Superpowers: TDD pattern
-// 2. Code: Implementation
-// 3. Verification: Validation
-// 4. Memory: Store context
+// Type: /soulai tdd
+
+// SoulAI executes superpowers test-driven-development skill:
+// 1. Write failing test FIRST
+// 2. Implement minimal code to pass
+// 3. Refactor
+// 4. Verify with tests
 ```
-
----
-
-## 🛡️ Anti-Hallucination System
-
-<div align="center">
-
-```mermaid
-graph LR
-    A[Operation Request] --> B{Pre-Execution<br/>Validation}
-    B --> C[File Validator]
-    B --> D[Code Validator]
-    B --> E[Git Validator]
-    C --> F[Execute]
-    D --> F
-    E --> F
-    F --> G{Post-Execution<br/>Validation}
-    G --> H[Confidence<br/>Scoring]
-    H --> I{Score?}
-    I -->|≥90%| J[Auto-Approve]
-    I -->|70-89%| K[Review]
-    I -->|<70%| L[Block]
-
-    style B fill:#4A90E2,color:#fff
-    style G fill:#4A90E2,color:#fff
-    style J fill:#50C878,color:#fff
-    style K fill:#FFA500,color:#fff
-    style L fill:#FF6B6B,color:#fff
-```
-
-</div>
-
-### Verification Pipeline
-
-| Component | Type | Purpose |
-|-----------|------|---------|
-| **File Validator** | Validator | Ensures files exist before operations |
-| **Code Validator** | Validator | Validates syntax and structure |
-| **Dependency Validator** | Validator | Checks package dependencies |
-| **Git Validator** | Validator | Verifies repository state |
-| **Claim Validator** | Validator | Validates AI assertions |
-| **Pre-execution** | Strategy | Validates prerequisites |
-| **Post-execution** | Strategy | Validates results |
-| **Diff Analyzer** | Strategy | Compares before/after states |
-| **Hallucination Detector** | Guardrail | Prevents false assertions |
-| **Human Review** | Guardrail | Human-in-the-loop for high-risk ops |
-| **Confidence Scoring** | Guardrail | Rates reliability (A-F grades) |
 
 ---
 
@@ -243,58 +292,56 @@ export SOULAI_PLAN="team"
 ## 🎨 Features
 
 <details>
-<summary><b>🔄 Auto-Recovery System</b></summary>
+<summary><b>🔍 Dynamic Skill Scanning</b></summary>
 
-Automatic server recovery with:
-- Crash detection via process monitoring
-- 2-second delay between restart attempts
-- Maximum 3 retry attempts
-- Auto-disable after 3 consecutive failures
-- Counter reset on successful restart
-
-```
-[Start] → [Initialize] → [Running] → [Monitoring]
-                              ↓
-                         [Crash?] → [Recovery]
-                              ↓
-                         [Retry] → [Success/Fail]
-                              ↓
-                         [Max 3] → [Disable]
-```
-
-</details>
-
-<details>
-<summary><b>⚙️ 3-Layer Configuration</b></summary>
-
-Configuration merge priority:
-1. **Default Config** (`config/default.json`) - Lowest priority
-2. **User Config** (`~/.soulai/config.json`) - Medium priority
-3. **Environment Variables** - Highest priority
+Automatically scans submodules for skills:
+- Searches `submodules/*/skills/` directories
+- Parses SKILL.md files with frontmatter
+- Generates command mappings (e.g., `systematic-debugging` → `debug`)
+- Creates skill.md with 161 skills
 
 ```javascript
-// Layer 1: Default
-{ "plan": "free", "maxAgents": 1 }
-
-// Layer 2: User config
-{ "plan": "team" }
-
-// Layer 3: Environment
-SOULAI_PLAN="enterprise"
-
-// Result: plan="enterprise", maxAgents=1
+// scripts/skill-scanner.js
+const scanner = new SkillScanner(projectRoot)
+const stats = await scanner.getStats()
+// { totalSkills: 161, totalSubmodules: 4 }
 ```
 
 </details>
 
 <details>
-<summary><b>🧠 Memory Management</b></summary>
+<summary><b>📦 Project-Specific Installation</b></summary>
 
-Dual-layer memory system:
-- **In-Memory Map**: Fast access for active sessions
-- **Disk Persistence**: Durability across restarts
-- **Storage Location**: `~/.soulai/memory/`
-- **Auto-Save**: Periodic disk sync
+Install per-project, not globally:
+- No global config pollution
+- Each project gets its own AI name
+- Isolated skill.md per project
+- Auto-detection of project type
+
+```bash
+cd project-a && npx soulai init  # Creates .claude/skills/soulai/
+cd project-b && npx soulai init  # Creates .claude/skills/revo/
+# Each project has independent configuration
+```
+
+</details>
+
+<details>
+<summary><b>⚡ Zero-Config Setup</b></summary>
+
+Minimal prompts, maximum automation:
+1. **Auto-detect project type** from package.json
+2. **Ask only 2 questions**: AI name + Claude plan
+3. **Scan submodules** automatically
+4. **Generate skill.md** with all 161 skills
+5. **Create MCP bridge** with command mappings
+
+```bash
+npx soulai init
+# AI name? [SoulAI]
+# Plan? [Pro / Max 5x / Max 20x]
+# Done! 161 skills ready.
+```
 
 </details>
 
@@ -304,14 +351,18 @@ Dual-layer memory system:
 Personalize your AI assistant:
 
 ```bash
-# Revo
+# During init
+npx soulai init
+# AI name? Revo
+
+# Or set default
 export SOULAI_AI_NAME="Revo"
+```
 
-# EjenAli
-export SOULAI_AI_NAME="EjenAli"
-
-# Alice
-export SOULAI_AI_NAME="Alice"
+Then use in Claude Code:
+```bash
+/revo debug      # Instead of /soulai debug
+/revo tdd        # Instead of /soulai tdd
 ```
 
 **Validation rules**:
@@ -321,59 +372,63 @@ export SOULAI_AI_NAME="Alice"
 
 </details>
 
----
+<details>
+<summary><b>📊 Plan-Based Optimization</b></summary>
 
-## 🧪 Testing
+Auto-adjusts based on Claude Code plan:
 
-SoulAI uses Test-Driven Development (TDD) with comprehensive coverage.
+| Plan | Max Agents | Token Budget | Context |
+|------|-----------|--------------|---------|
+| Pro | 3 | 200K | High |
+| Max 5x | 8 | 1M | Very High |
+| Max 20x | 20 | 4M | Unlimited |
 
-```bash
-# Run all tests (86 passing)
-npm test
-
-# Run with coverage (85%+)
-npm test:coverage
-
-# Watch mode
-npm test:watch
+Configured during `soulai init` and saved to:
+```
+.claude/skills/{ai-name}/config.json
 ```
 
-### Test Structure
-
-```
-tests/
-├── unit/           # Unit tests (60% coverage)
-├── integration/    # Integration tests (30%)
-└── e2e/            # End-to-end tests (10%)
-```
+</details>
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Currently focused on Phase 2 (MCP Server Implementation).
 
-### Quick Guide
+### How to Contribute
 
 ```bash
 # 1. Fork and clone
 git clone https://github.com/your-username/Project-SoulAI.git
+cd Project-SoulAI
 
-# 2. Create feature branch
+# 2. Install dependencies
+npm install
+
+# 3. Initialize submodules
+git submodule update --init --recursive
+
+# 4. Create feature branch
 git checkout -b feature/my-feature
 
-# 3. Write tests first (TDD)
-npm test  # Should fail (RED)
-
-# 4. Implement feature
+# 5. Make changes
 # ... code ...
 
-# 5. Run tests
-npm test  # Should pass (GREEN)
+# 6. Test locally
+cd test-project
+npx soulai init  # Test your changes
 
-# 6. Submit PR
+# 7. Submit PR
 git push origin feature/my-feature
 ```
+
+### Priority Areas
+
+- **MCP Server** - Implement skill execution engine
+- **Skill Integration** - Add more submodules
+- **Documentation** - Improve guides and examples
+- **Testing** - Add unit and integration tests
 
 ---
 
@@ -383,11 +438,10 @@ git push origin feature/my-feature
 
 | Document | Description |
 |----------|-------------|
-| [📖 Installation Guide](docs/INSTALLATION.md) | Step-by-step setup instructions |
-| [⚙️ Configuration](docs/CONFIGURATION.md) | Configuration reference |
-| [🏗️ Architecture](docs/ARCHITECTURE.md) | System architecture deep-dive |
-| [🛡️ Anti-Hallucination](docs/ANTI-HALLUCINATION.md) | Verification system details |
-| [🔌 API Documentation](docs/API.md) | API reference |
+| [🗺️ Integration Plan](INTEGRATION_PLAN.md) | Phase 2 MCP server roadmap |
+| [🏗️ Architecture V2](ARCHITECTURE_V2.md) | Skill-based system design |
+| [💾 Memory](memory/MEMORY.md) | Development lessons learned |
+| [📝 Changelog](https://github.com/HazimKhairi/Project-SoulAI/commits/main) | Recent changes |
 
 </div>
 
@@ -396,53 +450,60 @@ git push origin feature/my-feature
 ## 🐛 Troubleshooting
 
 <details>
-<summary><b>Socket Connection Failed</b></summary>
+<summary><b>Command not found: soulai</b></summary>
 
 ```bash
-# Check server status
-soulai status
+# Use npx instead
+npx soulai init
 
-# Clean up old sockets
-rm -f ~/.soulai/sockets/*.sock
-
-# Restart
-soulai stop && soulai start
+# Or install globally
+npm install -g soulai
 ```
 
 </details>
 
 <details>
-<summary><b>Server Crash Loop</b></summary>
+<summary><b>Skills not showing in Claude Code</b></summary>
 
 ```bash
-# Check logs
-tail -100 ~/.soulai/logs/soulai.log
+# Check if skill.md was created
+ls -la .claude/skills/*/skill.md
 
-# Reset crash counter
-soulai stop && soulai start
+# Verify content
+cat .claude/skills/soulai/skill.md
 
-# Disable problematic server
-echo '{"servers":{"search":{"enabled":false}}}' > ~/.soulai/config.json
+# Re-run init if needed
+npx soulai init
 ```
 
 </details>
 
 <details>
-<summary><b>High Token Usage</b></summary>
+<summary><b>Submodules not initialized</b></summary>
 
 ```bash
-# Lower plan settings
-export SOULAI_PLAN="free"
+# Initialize submodules
+git submodule update --init --recursive
 
-# Reduce agents
-cat > ~/.soulai/config.json << EOF
-{
-  "optimization": {
-    "maxAgents": 1,
-    "tokenBudget": 30000
-  }
-}
-EOF
+# Verify submodules
+ls submodules/
+# Should show: superpowers, everything-claude-code, etc.
+```
+
+</details>
+
+<details>
+<summary><b>Path with spaces causing errors</b></summary>
+
+This is fixed in the current version. If you still see issues:
+
+```bash
+# Ensure you're on latest version
+git pull origin main
+npm install
+
+# Re-run init
+npx soulai init
 ```
 
 </details>
