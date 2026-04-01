@@ -47,8 +47,14 @@ ${aiName} is your personal AI assistant for **${projectName}** (${projectType}) 
 
     // Generate sections for each submodule
     for (const submodule of scanned) {
-      content += `## ${submodule.icon} ${submodule.category}\n\n`
-      content += `**Source:** \`${submodule.name}\` (${submodule.count} skills)\n\n`
+      // Format submodule name for display (superpowers → Superpowers)
+      const displayName = submodule.name
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+
+      content += `## ${submodule.icon} ${displayName}\n\n`
+      content += `**Source:** \`${submodule.name}\` • ${submodule.category} (${submodule.count} skills)\n\n`
 
       for (const skill of submodule.skills) {
         content += `### /${aiNameLower} ${skill.command}\n`

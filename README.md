@@ -162,6 +162,36 @@ graph TB
 - [ ] Command routing (skill.md → MCP → submodule files)
 - [ ] End-to-end testing
 
+### 📋 Phase 3: Anti-Hallucination System (Planned)
+
+**11-component verification pipeline:**
+
+**5 Validators:**
+- [ ] File Validator - Ensures files exist before operations
+- [ ] Code Validator - Validates syntax and structure
+- [ ] Dependency Validator - Checks package dependencies
+- [ ] Git Validator - Verifies repository state
+- [ ] Claim Validator - Validates AI assertions
+
+**3 Strategies:**
+- [ ] Pre-execution - Validates prerequisites
+- [ ] Post-execution - Validates results
+- [ ] Diff Analyzer - Compares before/after states
+
+**3 Guardrails:**
+- [ ] Hallucination Detector - Prevents false assertions
+- [ ] Human Review - Human-in-the-loop for high-risk ops
+- [ ] Confidence Scoring - Rates reliability (A-F grades)
+
+**Goal:** Prevent AI from making unverified claims about files, code, or operations.
+
+### 📋 Phase 4: Auto-Recovery (Planned)
+
+- [ ] Server crash detection
+- [ ] Automatic restart (max 3 retries)
+- [ ] Health monitoring
+- [ ] Performance metrics
+
 ### 🎯 Submodule Ecosystem
 
 <table>
