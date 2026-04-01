@@ -140,10 +140,17 @@ describe('Full Workflow E2E', () => {
     }
 
     // Should not commit
-    await mcpServer.commitMiddleware.handle(result)
+    const gitHelperForTest = new GitHelper(testDir)
+    const testCommitMiddleware = new CommitMiddleware({
+      enabled: true,
+      commitOnSuccess: true,
+      semanticMessages: true,
+      coAuthorTag: 'TestAI',
+      failSafe: true
+    }, gitHelperForTest)
+    await testCommitMiddleware.handle(result)
 
     // Verify changes still uncommitted
-    const gitHelperForTest = new GitHelper(testDir)
     expect(await gitHelperForTest.hasUncommittedChanges()).toBe(true)
   })
 
@@ -251,14 +258,22 @@ describe('Full Workflow E2E', () => {
       { success: true, skillName: 'review', filesChanged: ['file3.js'] }
     ]
 
+    const gitHelperForTest = new GitHelper(testDir)
+    const testCommitMiddleware = new CommitMiddleware({
+      enabled: true,
+      commitOnSuccess: true,
+      semanticMessages: true,
+      coAuthorTag: 'TestAI',
+      failSafe: true
+    }, gitHelperForTest)
+
     // Note: In real scenario, these would be executed sequentially
     // but testing concurrent handling
     for (const result of results) {
-      await mcpServer.commitMiddleware.handle(result)
+      await testCommitMiddleware.handle(result)
     }
 
     // Verify all committed
-    const gitHelperForTest = new GitHelper(testDir)
     expect(await gitHelperForTest.hasUncommittedChanges()).toBe(false)
   })
 
