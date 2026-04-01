@@ -1,5 +1,14 @@
-# Git submodules will be added in next task
-# Format:
-# [submodule "submodules/superpowers"]
-#   path = submodules/superpowers
-#   url = https://github.com/HazimKhairi/Project-SoulAI.git
+[submodule "submodules/everything-claude-code"]
+	path = submodules/everything-claude-code
+	url = https://github.com/affaan-m/everything-claude-code.git
+	branch = main
+
+[submodule "submodules/ui-ux-pro-max-skill"]
+	path = submodules/ui-ux-pro-max-skill
+	url = https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+	branch = main
+
+[submodule "submodules/claude-mem"]
+	path = submodules/claude-mem
+	url = https://github.com/thedotmack/claude-mem.git
+	branch = main
