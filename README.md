@@ -3,7 +3,7 @@
 **Skill-based workflow agent for Claude Code - Save 40-60% tokens with 161 systematic skills**
 
 [![Skills](https://img.shields.io/badge/skills-161-blue?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
-[![Submodules](https://img.shields.io/badge/submodules-4-green?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
+[![Submodules](https://img.shields.io/badge/submodules-5-green?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
 [![Token Savings](https://img.shields.io/badge/token_savings-40--60%25-brightgreen?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
@@ -33,7 +33,7 @@ soulai tokens       # Track current Claude usage with progress bars
 
 ## Skills & Agents
 
-**161 skills from 4 submodules:**
+**161 skills from 5 submodules:**
 
 ### Superpowers (14 skills)
 Development workflows and systematic approaches:
@@ -73,6 +73,9 @@ Professional development skills across all domains:
 
 ### UI/UX Pro Max (0 skills)
 Design systems and Stitch integration (coming soon)
+
+### Context7 (0 skills)
+AI-powered semantic search and RAG (coming soon)
 
 ### Claude Mem (0 skills)
 Persistent memory and context management (coming soon)
@@ -173,7 +176,7 @@ SoulAI automatically commits your changes after each successful skill execution 
 
 ### Session Loader
 
-All 161 skills from 4 submodules are automatically loaded into Claude's context at session start.
+All 161 skills from 5 submodules are automatically loaded into Claude's context at session start.
 
 **Benefits:**
 - Claude knows all available skills
@@ -198,7 +201,7 @@ All 161 skills from 4 submodules are automatically loaded into Claude's context 
 - [x] Skill scanner (scripts/skill-scanner.js)
 - [x] Skill generator (scripts/skill-generator.js)
 - [x] Integration into init (scripts/init-skill.js)
-- [x] 161 skills from 4 submodules
+- [x] 161 skills from 5 submodules
 - [x] MCP bridge configuration
 - [x] Project-specific installation
 - [x] Token usage auto-detection (scripts/token-usage-reader.js)

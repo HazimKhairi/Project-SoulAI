@@ -18,3 +18,4 @@
 [submodule "submodules/context7"]
 	path = submodules/context7
 	url = https://github.com/upstash/context7.git
+	branch = master
