@@ -157,6 +157,33 @@ npx soulai init
 
 ---
 
+## New Features
+
+### Auto-Commit
+
+SoulAI automatically commits your changes after each successful skill execution with semantic commit messages.
+
+**Example:**
+```bash
+/soulai debug  # Fixes bug in auth.js
+# Auto-commits: "fix: resolve authentication timeout in login flow"
+```
+
+[Learn more](docs/features/auto-commit.md)
+
+### Session Loader
+
+All 161 skills from 4 submodules are automatically loaded into Claude's context at session start.
+
+**Benefits:**
+- Claude knows all available skills
+- 40-60% fewer tokens per task
+- Proactive skill suggestions
+
+[Learn more](docs/features/session-loader.md)
+
+---
+
 ## Implementation Status
 
 | Phase | Status | Description |
