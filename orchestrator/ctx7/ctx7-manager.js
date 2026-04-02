@@ -1,8 +1,11 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const execAsync = promisify(exec);
 
 /**
  * Manages Context7 (ctx7) integration for SoulAI.
@@ -29,8 +32,8 @@ export class Ctx7Manager {
     this.proactiveSuggestions = this.config.proactiveSuggestions || false;
     this.autoSearch = this.config.autoSearch || [];
     this.subagentMode = this.config.subagentMode || 'hybrid';
-    this.cacheResults = this.config.cacheResults || true;
-    this.failSafe = this.config.failSafe || true;
+    this.cacheResults = this.config.cacheResults ?? true;
+    this.failSafe = this.config.failSafe ?? true;
     this.maxRetries = this.config.maxRetries || 3;
     this.timeout = this.config.timeout || 10000;
 
@@ -46,5 +49,56 @@ export class Ctx7Manager {
     if (!this.enabled) {
       throw new Error('ctx7 is disabled in configuration');
     }
+  }
+
+  /**
+   * Execute a ctx7 CLI command
+   * @param {string[]} args - Command arguments (e.g., ['library', 'react', 'hooks'])
+   * @returns {Promise<string|null>} Command output or null if failSafe enabled and command failed
+   */
+  async execCtx7(args) {
+    this.ensureEnabled();
+
+    const command = `node "${this.ctx7Path}" ${args.join(' ')}`;
+    let lastError;
+
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        const { stdout, stderr } = await execAsync(command, {
+          timeout: this.timeout,
+          maxBuffer: 10 * 1024 * 1024 // 10MB buffer
+        });
+
+        if (stderr && !this.failSafe) {
+          throw new Error(`ctx7 command stderr: ${stderr}`);
+        }
+
+        return stdout;
+      } catch (error) {
+        lastError = error;
+
+        // Check if error is retryable
+        const isRetryable =
+          error.code === 'ECONNREFUSED' ||
+          error.code === 'ENOTFOUND' ||
+          error.code === 'ETIMEDOUT' ||
+          error.message.includes('rate limit');
+
+        if (!isRetryable || attempt === this.maxRetries) {
+          break;
+        }
+
+        // Exponential backoff: 100ms, 200ms, 400ms...
+        await new Promise(resolve => setTimeout(resolve, 100 * Math.pow(2, attempt - 1)));
+      }
+    }
+
+    // Handle final error
+    if (this.failSafe) {
+      console.warn(`[WARNING] ctx7 command failed: ${lastError.message}`);
+      return null;
+    }
+
+    throw lastError;
   }
 }
