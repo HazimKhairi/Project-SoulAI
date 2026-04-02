@@ -40,6 +40,30 @@
     "verification": {
       "enabled": true,
       "socketPath": "~/.soulai/sockets/verification.sock"
+    },
+    "ctx7": {
+      "enabled": false,
+      "socketPath": "~/.soulai/sockets/ctx7.sock",
+      "cliPath": "./submodules/context7/packages/cli/dist/index.js",
+      "proactiveSuggestions": true,
+      "autoSearch": ["react", "nextjs", "vue"],
+      "subagentMode": "hybrid",
+      "cacheResults": true,
+      "failSafe": true,
+      "maxRetries": 3,
+      "timeout": 10000
+    }
+  },
+  "features": {
+    "ctx7": {
+      "enabled": false,
+      "proactiveSuggestions": true,
+      "autoSearch": ["react", "nextjs", "vue"],
+      "subagentMode": "hybrid",
+      "cacheResults": true,
+      "failSafe": true,
+      "maxRetries": 3,
+      "timeout": 10000
     }
   },
   "verification": {
