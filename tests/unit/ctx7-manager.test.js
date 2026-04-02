@@ -196,3 +196,65 @@ describe('Ctx7Manager Subagent Integration', () => {
     expect(agent.detectFrameworks).toBeDefined();
   });
 });
+
+describe('Ctx7Manager Convenience Methods', () => {
+  let manager;
+
+  beforeEach(() => {
+    const mockConfig = {
+      features: {
+        ctx7: {
+          enabled: true,
+          proactiveSuggestions: true,
+          autoSearch: ['react', 'nextjs'],
+          subagentMode: 'hybrid',
+          cacheResults: true,
+          failSafe: true,
+          maxRetries: 3,
+          timeout: 10000
+        }
+      }
+    };
+    manager = new Ctx7Manager(mockConfig);
+    mockExecAsync.mockClear();
+  });
+
+  it('searchDocs delegates to DocsSearcherAgent', async () => {
+    mockExecAsync.mockResolvedValue({ stdout: 'React docs...', stderr: '' });
+
+    const result = await manager.searchDocs('react', 'hooks');
+
+    expect(result).toBe('React docs...');
+    expect(mockExecAsync).toHaveBeenCalledWith(
+      'node',
+      expect.arrayContaining(['library', 'react', 'hooks']),
+      expect.any(Object)
+    );
+  });
+
+  it('suggestSkills delegates to SkillsAnalyzerAgent', async () => {
+    mockExecAsync.mockResolvedValue({ stdout: 'tdd,debugging', stderr: '' });
+
+    const result = await manager.suggestSkills();
+
+    expect(result).toBe('tdd,debugging');
+    expect(mockExecAsync).toHaveBeenCalledWith(
+      'node',
+      expect.arrayContaining(['skills', 'suggest', '--claude']),
+      expect.any(Object)
+    );
+  });
+
+  it('analyzeProject delegates to SuggestEngineAgent', async () => {
+    const packageJson = {
+      dependencies: { 'react': '^18.0.0', 'next': '^14.0.0' }
+    };
+
+    const result = await manager.analyzeProject(packageJson);
+
+    expect(result).toEqual([
+      { library: 'react', relevance: 90 },
+      { library: 'nextjs', relevance: 90 }
+    ]);
+  });
+});

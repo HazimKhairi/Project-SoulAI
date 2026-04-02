@@ -157,12 +157,12 @@ export class Ctx7Manager {
 
   /**
    * Convenience method: Analyze project and generate suggestions
-   * @param {string} projectPath - Path to project directory
+   * @param {Object} packageJson - Parsed package.json object
    * @returns {Promise<Object>} Analysis results with suggestions
    */
-  async analyzeProject(projectPath) {
+  async analyzeProject(packageJson) {
     const agent = this.spawnSuggestEngine();
-    const frameworks = await agent.detectFrameworks(projectPath);
+    const frameworks = agent.detectFrameworks(packageJson);
     return agent.generateSuggestions(frameworks);
   }
 }
