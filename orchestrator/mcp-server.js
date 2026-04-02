@@ -11,6 +11,10 @@ import { SessionLoader } from './middleware/session-loader.js'
 import { CommitMiddleware } from './middleware/commit-middleware.js'
 import { Ctx7Manager } from './ctx7/ctx7-manager.js'
 import { Ctx7Middleware } from './middleware/ctx7-middleware.js'
+import { SuperpowersMiddleware } from './middleware/superpowers-middleware.js'
+import { SkillEnforcementMiddleware } from './middleware/skill-enforcement-middleware.js'
+import { ParallelExecutionMiddleware } from './middleware/parallel-execution-middleware.js'
+import { MemorySaverMiddleware } from './middleware/memory-saver-middleware.js'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -42,6 +46,15 @@ export class McpServer {
       this.gitHelper
     )
 
+    // Initialize workflow middleware
+    this.superpowersMiddleware = new SuperpowersMiddleware(this.projectRoot)
+    this.skillEnforcementMiddleware = new SkillEnforcementMiddleware()
+    this.parallelExecutionMiddleware = new ParallelExecutionMiddleware(this.projectRoot)
+
+    // Initialize memory middleware (with stub if no memory server)
+    const memoryServer = this.createMemoryServerStub()
+    this.memorySaverMiddleware = new MemorySaverMiddleware(memoryServer)
+
     // Initialize Ctx7 (Context7 integration)
     if (config.features?.ctx7?.enabled) {
       this.ctx7Manager = new Ctx7Manager(config)
@@ -52,6 +65,19 @@ export class McpServer {
     }
 
     this.setupHandlers()
+  }
+
+  /**
+   * Create memory server stub
+   * TODO: Replace with actual memory server when available
+   */
+  createMemoryServerStub() {
+    return {
+      saveMemory: async (key, value, metadata) => {
+        console.log(`[INFO] Memory stub: Would save ${key}`)
+        return { success: true }
+      }
+    }
   }
 
   /**
@@ -128,47 +154,102 @@ export class McpServer {
   }
 
   /**
-   * Execute skill command
+   * Execute skill command with middleware pipeline
    */
   async executeSkill(skillName, args) {
-    const result = {
-      success: false,
-      skillName: skillName,
-      output: '',
-      filesChanged: []
-    }
-
     try {
-      // Find skill file
-      const skillPath = await this.findSkillFile(skillName)
-      if (!skillPath) {
-        result.output = `[ERROR] Skill not found: ${skillName}`
-        return { content: [{ type: 'text', text: result.output }] }
+      // 1. Create context
+      let context = {
+        skillName,
+        args,
+        timestamp: new Date().toISOString()
       }
 
-      // Execute skill
-      const skillContent = await fs.readFile(skillPath, 'utf8')
-      result.output = `[OK] Executing skill: ${skillName}\n\n${skillContent}`
-      result.success = true
+      // 2. Run SuperpowersMiddleware (brainstorming + planning)
+      console.log('[INFO] Running SuperpowersMiddleware...')
+      context = await this.superpowersMiddleware.handle(context)
 
-      // Get changed files for commit
-      result.filesChanged = await this.gitHelper.getChangedFiles()
+      // 3. Run SkillEnforcementMiddleware (assign submodules)
+      console.log('[INFO] Running SkillEnforcementMiddleware...')
+      context = await this.skillEnforcementMiddleware.handle(context)
 
-      // Auto-commit if enabled
-      await this.commitMiddleware.handle(result)
+      // 4. Check remote git (once at start)
+      await this.commitMiddleware.checkRemoteGit()
+
+      // 5. Run ParallelExecutionMiddleware (spawn agents)
+      console.log('[INFO] Running ParallelExecutionMiddleware...')
+      context = await this.parallelExecutionMiddleware.handle(context)
+
+      // 6. Commit after each agent completion
+      if (context.agentResults) {
+        for (const agentResult of context.agentResults) {
+          if (agentResult.status === 'success') {
+            await this.commitMiddleware.handleAgentCompletion(agentResult)
+          }
+        }
+      }
+
+      // 7. Run MemorySaverMiddleware (save plan + results)
+      console.log('[INFO] Running MemorySaverMiddleware...')
+      context = await this.memorySaverMiddleware.handle(context)
+
+      // 8. Format output
+      const output = this.formatWorkflowOutput(context)
 
       return {
         content: [
           {
             type: 'text',
-            text: result.output
+            text: output
           }
         ]
       }
     } catch (error) {
-      result.output = `[ERROR] Skill execution failed: ${error.message}`
-      return { content: [{ type: 'text', text: result.output }] }
+      console.error('[ERROR] Workflow failed:', error.message)
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `[ERROR] Workflow failed: ${error.message}`
+          }
+        ]
+      }
     }
+  }
+
+  /**
+   * Format workflow output for user
+   */
+  formatWorkflowOutput(context) {
+    const lines = []
+
+    lines.push('[OK] Workflow completed successfully')
+    lines.push('')
+
+    if (context.brainstormResult) {
+      lines.push('[INFO] Brainstorming completed')
+    }
+
+    if (context.plan) {
+      lines.push(`[INFO] Plan created with ${context.plan.tasks.length} tasks`)
+    }
+
+    if (context.agentResults) {
+      const successCount = context.agentResults.filter(r => r.status === 'success').length
+      const failCount = context.agentResults.filter(r => r.status === 'failed').length
+      lines.push(`[INFO] Agent execution: ${successCount} succeeded, ${failCount} failed`)
+
+      context.agentResults.forEach(result => {
+        const status = result.status === 'success' ? '[OK]' : '[ERROR]'
+        lines.push(`  ${status} ${result.task.description}`)
+      })
+    }
+
+    if (context.memorySaved) {
+      lines.push('[INFO] Results saved to memory')
+    }
+
+    return lines.join('\n')
   }
 
   /**
