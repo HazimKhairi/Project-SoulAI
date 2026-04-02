@@ -26,6 +26,7 @@
   ],
   "scripts": {
     "postinstall": "node scripts/postinstall.js",
+    "init": "node bin/soulai.js init",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "test:integration": "vitest --config vitest.integration.config.js",
