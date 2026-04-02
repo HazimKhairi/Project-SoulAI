@@ -2,6 +2,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { DocsSearcherAgent } from './docs-searcher-agent.js';
+import { SkillsAnalyzerAgent } from './skills-analyzer-agent.js';
+import { SuggestEngineAgent } from './suggest-engine-agent.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,5 +109,60 @@ export class Ctx7Manager {
     }
 
     throw lastError;
+  }
+
+  /**
+   * Spawn a DocsSearcherAgent for library/docs search
+   * @returns {DocsSearcherAgent} New DocsSearcherAgent instance
+   */
+  spawnDocsSearcher() {
+    return new DocsSearcherAgent(this);
+  }
+
+  /**
+   * Spawn a SkillsAnalyzerAgent for skills management
+   * @returns {SkillsAnalyzerAgent} New SkillsAnalyzerAgent instance
+   */
+  spawnSkillsAnalyzer() {
+    return new SkillsAnalyzerAgent(this);
+  }
+
+  /**
+   * Spawn a SuggestEngineAgent for framework detection
+   * @returns {SuggestEngineAgent} New SuggestEngineAgent instance
+   */
+  spawnSuggestEngine() {
+    return new SuggestEngineAgent();
+  }
+
+  /**
+   * Convenience method: Search library documentation
+   * @param {string} library - Library name (e.g., 'react', 'nextjs')
+   * @param {string} query - Search query
+   * @returns {Promise<string>} Search results
+   */
+  async searchDocs(library, query) {
+    const agent = this.spawnDocsSearcher();
+    return await agent.searchLibrary(library, query);
+  }
+
+  /**
+   * Convenience method: Get skill suggestions for current project
+   * @returns {Promise<string[]>} Array of suggested skills
+   */
+  async suggestSkills() {
+    const agent = this.spawnSkillsAnalyzer();
+    return await agent.suggestSkills();
+  }
+
+  /**
+   * Convenience method: Analyze project and generate suggestions
+   * @param {string} projectPath - Path to project directory
+   * @returns {Promise<Object>} Analysis results with suggestions
+   */
+  async analyzeProject(projectPath) {
+    const agent = this.spawnSuggestEngine();
+    const frameworks = await agent.detectFrameworks(projectPath);
+    return agent.generateSuggestions(frameworks);
   }
 }

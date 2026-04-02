@@ -160,3 +160,39 @@ describe('Ctx7Manager CLI Wrapper', () => {
       .rejects.toThrow('ctx7 args must be non-empty strings');
   });
 });
+
+describe('Ctx7Manager Subagent Integration', () => {
+  let manager;
+
+  beforeEach(() => {
+    const mockConfig = {
+      features: {
+        ctx7: {
+          enabled: true,
+          proactiveSuggestions: true,
+          autoSearch: ['react', 'nextjs'],
+          subagentMode: 'hybrid'
+        }
+      }
+    };
+    manager = new Ctx7Manager(mockConfig);
+  });
+
+  it('spawnDocsSearcher creates DocsSearcherAgent', () => {
+    const agent = manager.spawnDocsSearcher();
+    expect(agent).toBeDefined();
+    expect(agent.searchLibrary).toBeDefined();
+  });
+
+  it('spawnSkillsAnalyzer creates SkillsAnalyzerAgent', () => {
+    const agent = manager.spawnSkillsAnalyzer();
+    expect(agent).toBeDefined();
+    expect(agent.suggestSkills).toBeDefined();
+  });
+
+  it('spawnSuggestEngine creates SuggestEngineAgent', () => {
+    const agent = manager.spawnSuggestEngine();
+    expect(agent).toBeDefined();
+    expect(agent.detectFrameworks).toBeDefined();
+  });
+});
