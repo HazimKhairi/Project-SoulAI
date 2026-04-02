@@ -71,4 +71,32 @@ describe('CommitMiddleware', () => {
     expect(message).toContain('Applied skill workflow')
     expect(message).not.toContain('Files changed:')
   })
+
+  describe('remote git checking', () => {
+    test('checks remote git on initialization', async () => {
+      mockGitHelper.hasRemote = vi.fn().mockResolvedValue(true)
+      await middleware.checkRemoteGit()
+      expect(mockGitHelper.hasRemote).toHaveBeenCalled()
+    })
+
+    test('warns if no remote git found', async () => {
+      mockGitHelper.hasRemote = vi.fn().mockResolvedValue(false)
+      const consoleSpy = vi.spyOn(console, 'log')
+
+      await middleware.checkRemoteGit()
+
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[WARNING] No remote'))
+    })
+
+    test('handles agent completion commits', async () => {
+      const agentResult = {
+        task: { description: 'Build UI', skillName: 'frontend-design' },
+        filesChanged: ['src/components/Button.tsx']
+      }
+
+      await middleware.handleAgentCompletion(agentResult)
+
+      expect(mockGitHelper.commit).toHaveBeenCalled()
+    })
+  })
 })

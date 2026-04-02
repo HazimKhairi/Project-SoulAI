@@ -140,4 +140,63 @@ export class CommitMiddleware {
     const coAuthor = `Co-authored-by: ${this.config.coAuthorTag} <${this.config.coAuthorTag.toLowerCase()}@local>`
     return `chore: changes from ${skillName} skill\n\n${coAuthor}`
   }
+
+  /**
+   * Check remote git (call once at workflow start)
+   */
+  async checkRemoteGit() {
+    try {
+      const hasRemote = await this.gitHelper.hasRemote()
+
+      if (!hasRemote) {
+        console.log('[WARNING] No remote git repository found')
+        console.log('[INFO] Changes will be committed locally')
+        console.log('[INFO] Push manually with: git push origin main')
+      }
+
+      return hasRemote
+    } catch (error) {
+      console.log('[WARNING] Could not check remote git:', error.message)
+      console.log('[INFO] Assuming no remote, will commit locally')
+      return false
+    }
+  }
+
+  /**
+   * Handle agent completion (commit after each agent)
+   */
+  async handleAgentCompletion(agentResult) {
+    // Check if this agent made changes
+    const hasChanges = await this.gitHelper.hasUncommittedChanges()
+    if (!hasChanges) {
+      console.log('[INFO] No changes from this agent, skipping commit')
+      return
+    }
+
+    // Generate commit message for this specific agent
+    const message = this.generateAgentCommitMessage(agentResult)
+
+    // Commit
+    try {
+      await this.gitHelper.commit(message)
+      console.log(`[OK] Committed changes from ${agentResult.task.description}`)
+    } catch (error) {
+      console.error('[ERROR] Git commit failed:', error.message)
+      if (!this.config.failSafe) {
+        throw error
+      }
+    }
+  }
+
+  /**
+   * Generate commit message for agent completion
+   */
+  generateAgentCommitMessage(agentResult) {
+    const prefix = this.getCommitPrefix(agentResult.task.skillName)
+    const description = this.sanitizeForCommit(agentResult.task.description)
+    const files = (agentResult.filesChanged || []).map(f => this.sanitizeForCommit(f))
+    const coAuthor = `Co-authored-by: ${this.config.coAuthorTag} <${this.config.coAuthorTag.toLowerCase()}@local>`
+
+    return `${prefix}: ${description}\n\nApplied ${agentResult.task.skillName} skill\nFiles changed: ${files.join(', ')}\n\n${coAuthor}`
+  }
 }
