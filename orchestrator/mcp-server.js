@@ -9,6 +9,8 @@ import {
 import { GitHelper } from './git-helper.js'
 import { SessionLoader } from './middleware/session-loader.js'
 import { CommitMiddleware } from './middleware/commit-middleware.js'
+import { Ctx7Manager } from './ctx7/ctx7-manager.js'
+import { Ctx7Middleware } from './middleware/ctx7-middleware.js'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -39,6 +41,15 @@ export class McpServer {
       config.features?.autoCommit || {},
       this.gitHelper
     )
+
+    // Initialize Ctx7 (Context7 integration)
+    if (config.features?.ctx7?.enabled) {
+      this.ctx7Manager = new Ctx7Manager(config)
+      this.ctx7Middleware = new Ctx7Middleware(
+        this.ctx7Manager,
+        config.features.ctx7
+      )
+    }
 
     this.setupHandlers()
   }
