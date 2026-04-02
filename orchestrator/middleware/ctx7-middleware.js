@@ -1,3 +1,5 @@
+import crypto from 'crypto'
+
 /**
  * Ctx7Middleware - MCP middleware for Context7 integration
  * Provides proactive suggestions and error documentation search
@@ -26,8 +28,12 @@ export class Ctx7Middleware {
     }
 
     try {
-      // NOTE: Cache by packageJson content hash if needed in future
-      const cacheKey = `pre:${skillName}:${JSON.stringify(context.packageJson)}`
+      const packageJsonHash = context.packageJson
+        ? crypto.createHash('sha256')
+            .update(JSON.stringify(context.packageJson))
+            .digest('hex')
+        : 'empty'
+      const cacheKey = `pre:${skillName}:${packageJsonHash}`
       if (this.cache.has(cacheKey)) {
         return this.cache.get(cacheKey)
       }
