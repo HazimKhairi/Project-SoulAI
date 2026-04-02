@@ -129,6 +129,59 @@ const commands = {
     console.log('')
     console.log('[INFO] Or run:')
     console.log(`  claude mcp add soulai --command "${soulaiPath}" --args "start" --env "HOME=${homeDir}" --type stdio`)
+  },
+
+  async docs(library, query) {
+    if (!library || !query) {
+      console.log('[ERROR] Usage: soulai docs <library> <query>')
+      console.log('Example: soulai docs react "how to use useEffect"')
+      process.exit(1)
+    }
+
+    const { Ctx7Manager } = await import('../orchestrator/ctx7/ctx7-manager.js')
+    const config = await ConfigLoader.load()
+
+    if (!config.features?.ctx7?.enabled) {
+      console.log('[WARNING] ctx7 is disabled. Enable it in config.json')
+      process.exit(1)
+    }
+
+    const manager = new Ctx7Manager(config)
+    const result = await manager.searchDocs(library, query)
+
+    if (result) {
+      console.log(result)
+    } else {
+      console.log('[ERROR] Documentation search failed')
+      process.exit(1)
+    }
+  },
+
+  async ctx7(subcommand, ...args) {
+    if (!subcommand) {
+      console.log('[ERROR] Usage: soulai ctx7 <subcommand> [args...]')
+      console.log('Example: soulai ctx7 skills suggest')
+      process.exit(1)
+    }
+
+    const { Ctx7Manager } = await import('../orchestrator/ctx7/ctx7-manager.js')
+    const config = await ConfigLoader.load()
+
+    if (!config.features?.ctx7?.enabled) {
+      console.log('[WARNING] ctx7 is disabled. Enable it in config.json')
+      process.exit(1)
+    }
+
+    const manager = new Ctx7Manager(config)
+    const cmdArgs = [subcommand, ...args]
+    const result = await manager.execCtx7(cmdArgs)
+
+    if (result) {
+      console.log(result)
+    } else {
+      console.log('[ERROR] ctx7 command failed')
+      process.exit(1)
+    }
   }
 }
 
