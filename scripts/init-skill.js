@@ -6,6 +6,7 @@ import path from 'path'
 import inquirer from 'inquirer'
 import { SkillGenerator } from './skill-generator.js'
 import { SubmoduleDownloader } from '../orchestrator/submodule-downloader.js'
+import { setupCtx7 } from './ctx7-setup.js'
 
 console.log(chalk.blue('[INFO] SoulAI Skill Setup\n'))
 
@@ -139,6 +140,12 @@ async function initSkill() {
       console.log(chalk.yellow('[WARNING] You may have reduced functionality\n'))
     } else {
       console.log(chalk.green('[OK] All submodules ready\n'))
+    }
+
+    // Setup context7 integration (non-interactive)
+    const ctx7Ready = await setupCtx7(projectRoot, true)
+    if (!ctx7Ready) {
+      console.log(chalk.yellow('[INFO] Context7 setup incomplete (optional feature)\n'))
     }
 
     console.log(chalk.cyan('[INFO] Scanning submodules for skills...\n'))
