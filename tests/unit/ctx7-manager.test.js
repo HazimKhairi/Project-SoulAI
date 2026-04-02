@@ -11,17 +11,17 @@ vi.mock('util', async (importOriginal) => {
   };
 });
 
-// Mock child_process.exec
+// Mock child_process.execFile
 vi.mock('child_process', () => ({
-  exec: vi.fn()
+  execFile: vi.fn()
 }));
 
 import { Ctx7Manager } from '../../orchestrator/ctx7/ctx7-manager.js';
 import { promisify } from 'util';
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 
-// Get reference to the mocked exec function
-const mockExecAsync = promisify(exec);
+// Get reference to the mocked execFile function
+const mockExecAsync = promisify(execFile);
 
 describe('Ctx7Manager', () => {
   let manager;
@@ -143,5 +143,20 @@ describe('Ctx7Manager CLI Wrapper', () => {
 
     await expect(disabledManager.execCtx7(['library', 'react']))
       .rejects.toThrow('ctx7 is disabled');
+  });
+
+  it('should validate args are an array', async () => {
+    await expect(manager.execCtx7('not-an-array'))
+      .rejects.toThrow('ctx7 args must be an array');
+  });
+
+  it('should validate args are non-empty strings', async () => {
+    await expect(manager.execCtx7(['valid', '', 'args']))
+      .rejects.toThrow('ctx7 args must be non-empty strings');
+  });
+
+  it('should validate args elements are strings', async () => {
+    await expect(manager.execCtx7(['valid', 123, 'args']))
+      .rejects.toThrow('ctx7 args must be non-empty strings');
   });
 });

@@ -1,11 +1,11 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import { promisify } from 'util';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 /**
  * Manages Context7 (ctx7) integration for SoulAI.
@@ -59,19 +59,22 @@ export class Ctx7Manager {
   async execCtx7(args) {
     this.ensureEnabled();
 
-    const command = `node "${this.ctx7Path}" ${args.join(' ')}`;
+    // Validate args
+    if (!Array.isArray(args)) {
+      throw new Error('ctx7 args must be an array');
+    }
+    if (args.some(arg => typeof arg !== 'string' || arg.length === 0)) {
+      throw new Error('ctx7 args must be non-empty strings');
+    }
+
     let lastError;
 
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
-        const { stdout, stderr } = await execAsync(command, {
+        const { stdout, stderr } = await execFileAsync('node', [this.ctx7Path, ...args], {
           timeout: this.timeout,
           maxBuffer: 10 * 1024 * 1024 // 10MB buffer
         });
-
-        if (stderr && !this.failSafe) {
-          throw new Error(`ctx7 command stderr: ${stderr}`);
-        }
 
         return stdout;
       } catch (error) {
@@ -80,8 +83,11 @@ export class Ctx7Manager {
         // Check if error is retryable
         const isRetryable =
           error.code === 'ECONNREFUSED' ||
+          error.code === 'ECONNRESET' ||
+          error.code === 'EPIPE' ||
           error.code === 'ENOTFOUND' ||
           error.code === 'ETIMEDOUT' ||
+          error.code === 'ENETUNREACH' ||
           error.message.includes('rate limit');
 
         if (!isRetryable || attempt === this.maxRetries) {
