@@ -145,4 +145,46 @@ describe('GitHelper', () => {
     const log = await execAsync('git log -1 --pretty=%B', { cwd: TEST_REPO_DIR })
     expect(log.stdout).toContain('feat: add "quoted" feature')
   })
+
+  describe('hasRemote', () => {
+    test('returns true if remote exists', async () => {
+      await fs.mkdir(TEST_REPO_DIR, { recursive: true })
+      await execAsync('git init', { cwd: TEST_REPO_DIR })
+      await execAsync('git remote add origin https://github.com/user/repo.git', { cwd: TEST_REPO_DIR })
+
+      const helper = new GitHelper(TEST_REPO_DIR)
+      const result = await helper.hasRemote()
+
+      expect(result).toBe(true)
+    })
+
+    test('returns false if no remote', async () => {
+      await fs.mkdir(TEST_REPO_DIR, { recursive: true })
+      await execAsync('git init', { cwd: TEST_REPO_DIR })
+
+      const helper = new GitHelper(TEST_REPO_DIR)
+      const result = await helper.hasRemote()
+
+      expect(result).toBe(false)
+    })
+
+    test('returns false if not a git repo', async () => {
+      const helper = new GitHelper(TEST_REPO_DIR)
+      const result = await helper.hasRemote()
+
+      expect(result).toBe(false)
+    })
+
+    test('returns true for multiple remotes', async () => {
+      await fs.mkdir(TEST_REPO_DIR, { recursive: true })
+      await execAsync('git init', { cwd: TEST_REPO_DIR })
+      await execAsync('git remote add origin https://github.com/user/repo.git', { cwd: TEST_REPO_DIR })
+      await execAsync('git remote add upstream https://github.com/upstream/repo.git', { cwd: TEST_REPO_DIR })
+
+      const helper = new GitHelper(TEST_REPO_DIR)
+      const result = await helper.hasRemote()
+
+      expect(result).toBe(true)
+    })
+  })
 })

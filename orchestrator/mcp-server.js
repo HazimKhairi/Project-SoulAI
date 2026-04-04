@@ -293,23 +293,46 @@ export class McpServer {
   }
 
   /**
-   * Load config from project
+   * Load config from project with universal support
    */
   static async loadConfig(projectRoot) {
+    const configPaths = [
+      path.join(projectRoot, '.soulai', 'config.json'),
+      path.join(projectRoot, 'config', 'default.json'),
+      // Search in .claude/skills/*/config.json (take the first one)
+    ]
+
+    // Add .claude/skills search
     try {
-      const configPath = path.join(projectRoot, '.claude', 'skills', 'soulai', 'config.json')
-      const configData = await fs.readFile(configPath, 'utf8')
-      const config = JSON.parse(configData)
-      config.projectRoot = projectRoot
-      return config
-    } catch (error) {
-      console.error('[WARNING] Failed to load config, using defaults:', error.message)
-      return {
-        projectRoot,
-        features: {
-          autoCommit: { enabled: false },
-          sessionLoader: { enabled: true }
-        }
+      const claudeSkillsDir = path.join(projectRoot, '.claude', 'skills')
+      const subdirs = await fs.readdir(claudeSkillsDir)
+      for (const subdir of subdirs) {
+        configPaths.push(path.join(claudeSkillsDir, subdir, 'config.json'))
+      }
+    } catch (err) {
+      // .claude/skills doesn't exist, ignore
+    }
+
+    for (const configPath of configPaths) {
+      try {
+        const configData = await fs.readFile(configPath, 'utf8')
+        const config = JSON.parse(configData)
+        config.projectRoot = projectRoot
+        console.error(`[OK] Loaded config from ${configPath}`)
+        return config
+      } catch (error) {
+        continue
+      }
+    }
+
+    console.error('[WARNING] No config found, using universal defaults')
+    return {
+      aiName: 'SoulAI',
+      projectRoot,
+      features: {
+        autoCommit: { enabled: true },
+        sessionLoader: { enabled: true },
+        ctx7: { enabled: false }
       }
     }
   }

@@ -94,4 +94,21 @@ export class GitHelper {
       return ''
     }
   }
+
+  /**
+   * Check if git repository has a remote
+   * @returns {Promise<boolean>} true if remote exists, false otherwise
+   */
+  async hasRemote() {
+    if (!await this.isGitRepo()) {
+      return false
+    }
+
+    try {
+      const { stdout } = await execAsync('git remote -v', { cwd: this.projectDir })
+      return stdout.trim().length > 0
+    } catch {
+      return false
+    }
+  }
 }

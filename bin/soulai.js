@@ -65,24 +65,16 @@ const commands = {
   },
 
   async start() {
-    console.log('[INFO] Starting SoulAI orchestrator...')
+    console.error('[INFO] Starting SoulAI Universal Orchestrator (MCP)...')
 
-    const loader = new ConfigLoader()
-    const result = await loader.load()
+    const { McpServer } = await import('../orchestrator/mcp-server.js')
+    const projectRoot = process.env.PROJECT_ROOT || process.cwd()
+    
+    const config = await McpServer.loadConfig(projectRoot)
+    console.error(`[OK] ${config.aiName} v${config.version || '1.0.0'} loaded`)
 
-    if (!result.success) {
-      console.log('[ERROR] Failed to load config:', result.error)
-      process.exit(1)
-    }
-
-    const config = result.config
-    console.log(`[OK] ${config.aiName} v${config.version} loaded`)
-    console.log(`[INFO] Plan: ${config.plan}`)
-
-    const manager = new ServerManager(config)
-    const gateway = new Gateway(config.servers)
-
-    console.log('[OK] SoulAI ready')
+    const server = new McpServer(config)
+    await server.start()
   },
 
   async stop() {
@@ -212,7 +204,10 @@ if (commands[command]) {
   console.log('')
   console.log('Quick Start:')
   console.log('  cd your-project')
-  console.log('  soulai init')
+  console.log('  soulai init                   - Setup for Claude and/or Gemini')
   console.log('  soulai tokens                 - Update your token usage')
-  console.log('  # Then in Claude Code: /{your-ai-name} help')
+  console.log('')
+  console.log('  Integration:')
+  console.log('  # For Claude Code:   /{your-ai-name} help')
+  console.log('  # For Gemini CLI:    "Use {your-ai-name} to [task]"')
 }
