@@ -1,263 +1,52 @@
 # SoulAI
 
-**Skill-based workflow agent for Claude Code - Save 40-60% tokens with 161 systematic skills**
+**The Universal Orchestration Layer for AI-Native Development**
 
-[![Skills](https://img.shields.io/badge/skills-161-blue?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
-[![Submodules](https://img.shields.io/badge/submodules-5-green?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
-[![Token Savings](https://img.shields.io/badge/token_savings-40--60%25-brightgreen?style=flat-square)](https://github.com/HazimKhairi/Project-SoulAI)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+SoulAI is a deterministic, skill-based orchestration framework designed to bridge high-level intent with specialized execution across multiple AI CLI environments, including Claude Code and Gemini CLI. It optimizes token consumption by 40-60% through a systematic, multi-agent coordination pipeline.
 
 ---
 
-## Quick Start
+## Overview
 
+Modern AI development tools often operate in isolation, leading to redundant context usage and fragmented workflows. SoulAI provides a unified interface and a library of 161+ modular skills that allow AI agents to operate with precision, consistency, and structural integrity.
+
+By abstracting complex development patterns into executable "Skills," SoulAI enables:
+- **Token Efficiency:** Reduces overhead through shared context and parallel execution.
+- **Workflow Consistency:** Enforces standardized patterns across different LLMs.
+- **Cross-Platform Support:** Seamless integration with Claude Code and Gemini CLI.
+
+---
+
+## Key Features
+
+### Intelligent Workflow Orchestration
+SoulAI utilizes a four-stage middleware pipeline to coordinate multi-agent teams for complex tasks:
+- **Strategy Phase:** Brainstorms and defines implementation paths.
+- **Enforcement Phase:** Matches specialized agents to specific sub-domains (UI/UX, Backend, Security).
+- **Execution Phase:** Spawns parallel agents to accelerate development cycles.
+- **Commit Phase:** Automatically manages granular version control history.
+
+### Universal Skill Library
+Access a growing library of 161+ skills distributed across specialized submodules:
+- **Superpowers:** Systematic debugging, TDD, and architectural planning.
+- **Everything Claude Code:** Domain-specific expertise in 12+ languages and 10+ frameworks.
+- **Context7:** Semantic search and RAG-based documentation retrieval.
+
+### Token Usage Optimization
+Live tracking and dynamic optimization scoring to maintain usage under plan limits (Pro, Max 5x, Max 20x).
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js >= 20.0.0
+- Git
+- Access to Claude Code or Gemini CLI
+
+### Installation
 ```bash
-# In your project directory
-cd your-project
-
-# Install SoulAI
-npx soulai init
-
-# Update token usage (optional)
-soulai tokens       # Track current Claude usage with progress bars
-
-# Use in Claude Code
-/soulai debug       # Systematic debugging (saves 60% tokens)
-/soulai tdd         # Test-driven development (saves 35% tokens)
-/soulai brainstorm  # Brainstorm solutions (saves 25% tokens)
-/soulai plan        # Write implementation plan
-/soulai review      # Request code review
-```
-
----
-
-## Skills & Agents
-
-**161 skills from 5 submodules:**
-
-### Superpowers (14 skills)
-Development workflows and systematic approaches:
-- `debug` - Systematic root-cause debugging
-- `tdd` - Test-driven development workflow
-- `brainstorm` - Creative problem-solving
-- `plan` - Implementation planning
-- `review` - Code review automation
-- `verify` - Verification before completion
-- `parallel` - Dispatch parallel agents
-- `worktrees` - Git worktree workflows
-- `execute-plan` - Execute implementation plans
-- `finish` - Finish development branch
-- `fix-review` - Handle review feedback
-- `write-skill` - Create new skills
-- `subagent` - Subagent-driven development
-- `help` - Show all commands
-
-### Everything Claude Code (147 skills)
-Professional development skills across all domains:
-
-**Languages:**
-- Python, JavaScript, TypeScript, Go, Rust, Java, Kotlin, Swift, PHP, C#, C++, Elixir
-
-**Frameworks:**
-- React, Vue, Angular, Next.js, Laravel, Django, Spring Boot, Flutter, .NET Core
-
-**Specializations:**
-- Frontend Development, Backend Development, Fullstack Development
-- API Design, GraphQL, Microservices, Databases
-- DevOps, Docker, Kubernetes, CI/CD
-- AI/ML, Data Engineering, Security
-
-**Architecture:**
-- Hexagonal Architecture, Clean Architecture, Domain-Driven Design
-- Event-Driven Systems, CQRS, Event Sourcing
-
-### UI/UX Pro Max (0 skills)
-Design systems and Stitch integration (coming soon)
-
-### Context7 (0 skills)
-AI-powered semantic search and RAG (coming soon)
-
-### Claude Mem (0 skills)
-Persistent memory and context management (coming soon)
-
----
-
-## Configuration
-
-### Plan Optimization
-
-SoulAI auto-adjusts based on your Claude Code plan:
-
-| Plan | Price | Max Agents | Token Budget | Monthly Budget |
-|------|-------|-----------|--------------|----------------|
-| Pro | $20/mo | 3 | 200K | 800K |
-| Max 5x | $100/mo | 8 | 1M | 4M |
-| Max 20x | $200/mo | 20 | 4M | 16M |
-
-### Token Usage Tracking
-
-**Track your current token usage automatically:**
-
-```bash
-soulai tokens  # Update current usage with progress bars
-```
-
-**Auto-detection:** Checks 8 locations for Claude Code usage data
-- macOS: `~/Library/Application Support/Claude/`
-- Linux: `~/.config/claude-code/`, `~/.local/share/claude/`
-- Fallback: Manual input with validation
-
-**Example Output:**
-```
-Daily:   45.0K / 571.4K ██░░░░░░░░ 8%
-Weekly:  2.1M  / 4.0M   █████░░░░░ 53%
-Monthly: 8.5M  / 16.0M  █████░░░░░ 53%
-```
-
-**Plan Limits:**
-- Daily Budget: Based on your plan (28K - 571K)
-- Weekly Budget: Based on your plan (200K - 4M)
-- Monthly Budget: Based on your plan (800K - 16M)
-
-**Token Savings:**
-- Systematic debugging: 40% fewer tokens
-- TDD workflow: 35% fewer tokens
-- Brainstorming first: 25% fewer tokens
-- Verification: 20% fewer tokens
-
-**Target:** Keep usage under 80% of limits for safety buffer.
-
-### Custom AI Names
-
-Personalize your AI assistant:
-
-```bash
-npx soulai init
-# AI name? [SoulAI] Revo
-
-# Then use:
-/revo debug
-/revo tdd
-```
-
-**Validation:** 1-20 characters, alphanumeric + hyphens/underscores
-
----
-
-## Token Savings Comparison
-
-| Task | Without SoulAI | With SoulAI | Savings |
-|------|----------------|-------------|---------|
-| Bug Fixing | 200K tokens (4 retries) | 80K tokens (systematic) | 60% |
-| Feature Dev | 150K tokens (rewrites) | 98K tokens (TDD) | 35% |
-| Code Review | 100K tokens (manual) | 80K tokens (automated) | 20% |
-| Planning | 120K tokens (trial/error) | 90K tokens (brainstorm) | 25% |
-
-**Monthly Savings Example (Max 20x Plan):**
-- Without SoulAI: 16M tokens used (100% usage)
-- With SoulAI: 9.3M tokens used (58% usage)
-- **Saved: 6.7M tokens (42% monthly savings)**
-
----
-
-## New Features
-
-### Auto-Commit
-
-SoulAI automatically commits your changes after each successful skill execution with semantic commit messages.
-
-**Example:**
-```bash
-/soulai debug  # Fixes bug in auth.js
-# Auto-commits: "fix: resolve authentication timeout in login flow"
-```
-
-[Learn more](docs/features/auto-commit.md)
-
-### Session Loader
-
-All 161 skills from 5 submodules are automatically loaded into Claude's context at session start.
-
-**Benefits:**
-- Claude knows all available skills
-- 40-60% fewer tokens per task
-- Proactive skill suggestions
-
-[Learn more](docs/features/session-loader.md)
-
----
-
-## Implementation Status
-
-| Phase | Status | Description |
-|-------|--------|-------------|
-| Phase 1 | [COMPLETE] | Skill scanning, generation, integration |
-| Phase 2 | [IN PROGRESS] | MCP server for skill execution |
-| Phase 3 | [PLANNED] | Anti-hallucination verification layer |
-| Phase 4 | [COMPLETE] | Intelligent Workflow Orchestrator |
-
-### Phase 1: Skill System (Complete)
-
-- [x] Skill scanner (scripts/skill-scanner.js)
-- [x] Skill generator (scripts/skill-generator.js)
-- [x] Integration into init (scripts/init-skill.js)
-- [x] 161 skills from 5 submodules
-- [x] MCP bridge configuration
-- [x] Project-specific installation
-- [x] Token usage auto-detection (scripts/token-usage-reader.js)
-- [x] Interactive token update CLI (scripts/update-tokens.js)
-
-### Phase 2: MCP Server (In Progress)
-
-- [ ] MCP server implementation
-- [ ] Skill execution engine
-- [ ] Command routing (skill.md → MCP → submodule files)
-- [ ] End-to-end testing
-
-### Phase 4: Intelligent Workflow Orchestrator (Complete)
-
-Automatic multi-agent team coordination for complex development tasks:
-- [x] **Every /soulai command** triggers orchestration
-- [x] **SuperpowersMiddleware** - Brainstorms and creates task plan
-- [x] **SkillEnforcementMiddleware** - Enforces UI/UX → ui-ux-pro-max-skill
-- [x] **ParallelExecutionMiddleware** - Spawns agents in parallel (3-5x faster)
-- [x] **CommitMiddleware** - Auto-commits after each agent (granular history)
-- [x] **MemorySaverMiddleware** - Saves workflow to claude-mem
-
-**Performance:**
-- 3-5x faster than sequential execution
-- 30-50% fewer tokens (parallel context sharing)
-- Automatic activation (no configuration needed)
-
-**See:** [docs/features/phase4-orchestrator.md](docs/features/phase4-orchestrator.md)
-
-### Phase 3: Anti-Hallucination System (Planned)
-
-**11-component verification pipeline:**
-
-**Validators:**
-- File Validator - Ensures files exist before operations
-- Code Validator - Validates syntax and structure
-- Dependency Validator - Checks package dependencies
-- Git Validator - Verifies repository state
-- Claim Validator - Validates AI assertions
-
-**Strategies:**
-- Pre-execution - Validates prerequisites
-- Post-execution - Validates results
-- Diff Analyzer - Compares before/after states
-
-**Guardrails:**
-- Hallucination Detector - Prevents false assertions
-- Human Review - Human-in-the-loop for high-risk ops
-- Confidence Scoring - Rates reliability (A-F grades)
-
----
-
-## Installation
-
-```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/HazimKhairi/Project-SoulAI.git
 cd Project-SoulAI
 
@@ -266,89 +55,66 @@ npm install
 
 # Initialize submodules
 git submodule update --init --recursive
+```
 
-# Test locally
-cd test-project
+### Initialization
+Run the universal setup to configure SoulAI for your project and preferred AI tools:
+```bash
 npx soulai init
+```
+
+---
+
+## Usage
+
+### Using Claude Code
+Invoke SoulAI skills directly from the Claude Code interface using your assistant's invocation name:
+```bash
+/{your-ai-name} debug
+/{your-ai-name} plan
+```
+
+### Using Gemini CLI
+SoulAI mandates are automatically loaded from `GEMINI.md`. Trigger workflows through natural language:
+- "Use {your-ai-name} to analyze this codebase."
+- "Start a TDD session for a new auth module."
+
+---
+
+## Technical Architecture
+
+SoulAI operates as an MCP (Model Context Protocol) server via stdio, facilitating low-latency communication between the AI CLI and the skill execution engine.
+
+```
+┌───────────────────┐      ┌───────────────────┐
+│  Claude Code CLI  │      │    Gemini CLI     │
+└─────────┬─────────┘      └─────────┬─────────┘
+          │                          │
+          └───────────┬──────────────┘
+                      │
+            ┌─────────▼─────────┐
+            │ SoulAI Orchestrator│ (MCP Server)
+            └─────────┬─────────┘
+                      │
+      ┌───────────────┼───────────────┐
+      ▼               ▼               ▼
+┌───────────┐   ┌───────────┐   ┌───────────┐
+│ Skills    │   │ Memory    │   │ Search    │
+└───────────┘   └───────────┘   └───────────┘
 ```
 
 ---
 
 ## Contributing
 
-We welcome contributions! Currently focused on Phase 2 (MCP Server Implementation).
-
-**Priority Areas:**
-- MCP Server - Implement skill execution engine
-- Skill Integration - Add more submodules
-- Documentation - Improve guides and examples
-- Testing - Add unit and integration tests
-
-```bash
-# Fork and clone
-git clone https://github.com/your-username/Project-SoulAI.git
-
-# Create feature branch
-git checkout -b feature/my-feature
-
-# Test changes
-cd test-project
-npx soulai init
-
-# Submit PR
-git push origin feature/my-feature
-```
-
----
-
-## Troubleshooting
-
-**Command not found: soulai**
-```bash
-npx soulai init  # Use npx instead
-```
-
-**Skills not showing in Claude Code**
-```bash
-# Check if skill.md exists
-ls -la .claude/skills/*/skill.md
-
-# Re-run init if needed
-rm -rf .claude/skills/*
-npx soulai init
-```
-
-**Submodules not initialized**
-```bash
-git submodule update --init --recursive
-ls submodules/  # Should show: superpowers, everything-claude-code, etc.
-```
-
----
-
-## Documentation
-
-- [Integration Plan](INTEGRATION_PLAN.md) - Phase 2 MCP server roadmap
-- [Architecture V2](ARCHITECTURE_V2.md) - Skill-based system design
-- [Memory](memory/MEMORY.md) - Development lessons learned
-- [Changelog](https://github.com/HazimKhairi/Project-SoulAI/commits/main) - Recent changes
+We welcome contributions to the SoulAI ecosystem. Please refer to `CONTRIBUTING.md` for guidelines on submitting pull requests, reporting issues, and suggesting new skills.
 
 ---
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the `LICENSE` file for details.
 
 ---
 
-## Authors
-
-**HakasAI + Hazim**
-
-[![GitHub](https://img.shields.io/badge/GitHub-HazimKhairi-181717?style=flat-square&logo=github)](https://github.com/HazimKhairi)
-
----
-
-**Star us on GitHub — it motivates us a lot!**
-
-[Back to Top](#soulai)
+**Generated by SoulAI v1.0.0**
