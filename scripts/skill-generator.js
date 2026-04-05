@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import path from 'path'
 import { SkillScanner } from './skill-scanner.js'
 import { TokenUsageReader } from './token-usage-reader.js'
 
