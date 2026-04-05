@@ -5,10 +5,33 @@ import { spawn } from 'child_process'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { ConfigLoader } from '../config/config-loader.js'
+import { SkillScanner } from '../scripts/skill-scanner.js'
 import chalk from 'chalk'
+import fs from 'fs/promises'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+
+async function printBanner() {
+  const projectRoot = dirname(__dirname)
+  const pkgContent = await fs.readFile(join(projectRoot, 'package.json'), 'utf8')
+  const pkg = JSON.parse(pkgContent)
+  const scanner = new SkillScanner(projectRoot)
+  const stats = await scanner.getStats()
+  
+  const user = process.env.USER || 'guest'
+  const host = 'soulai'
+  
+  console.log()
+  console.log(`  ${chalk.cyan.bold(user)}${chalk.white('@')}${chalk.cyan.bold(host)}`)
+  console.log(`  ${chalk.white('-'.repeat(user.length + host.length + 1))}`)
+  console.log(`  ${chalk.cyan('Project')}:   ${chalk.white(pkg.name)}`)
+  console.log(`  ${chalk.cyan('Version')}:   ${chalk.white(pkg.version)}`)
+  console.log(`  ${chalk.cyan('Skills')}:    ${chalk.white(stats.totalSkills + ' modular skills')}`)
+  console.log(`  ${chalk.cyan('Engine')}:    ${chalk.white('Node ' + process.version)}`)
+  console.log(`  ${chalk.cyan('Status')}:    ${chalk.green('Active & Ready')}`)
+  console.log()
+}
 
 const commands = {
   async init() {
@@ -75,13 +98,12 @@ const commands = {
   }
 }
 
-const command = process.argv[2] || 'help'
+const command = process.argv[2]
 
 if (commands[command]) {
   commands[command]()
 } else {
-  console.log(chalk.blue('\n[SoulAI Universal Orchestrator]'))
-  console.log('Zero-config AI development assistant\n')
+  await printBanner()
   
   console.log(chalk.bold('Core Commands:'))
   console.log('  soulai init                   - Initialize SoulAI in current project')
