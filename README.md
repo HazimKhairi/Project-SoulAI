@@ -14,7 +14,7 @@ Modern AI development tools often operate in isolation, leading to redundant con
 
 ## 🚀 Key Features
 
-### 🧠 Master Orchestrator (Mandur Utama)
+### 🧠 Master Orchestrator
 SoulAI acts as the central intelligence that breaks down complex features into specialized tasks. It automatically selects and coordinates multiple submodules (Workers) to collaborate on a single feature, ensuring high-quality output with minimal token waste.
 
 ### 🤖 Multi-Module Collaboration
@@ -88,7 +88,7 @@ SoulAI operates as an MCP (Model Context Protocol) server, coordinating a swarm 
 
 ```
             ┌─────────▼─────────┐
-            │ SoulAI Orchestrator│ (Master Mandur)
+            │ SoulAI Orchestrator│ (Master Orchestrator)
             └─────────┬─────────┘
       ┌───────────────┼───────────────┐
       ▼               ▼               ▼

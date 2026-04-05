@@ -122,7 +122,7 @@ ${aiName} is your personal AI assistant for **${projectName}** (${projectType}) 
 /${aiNameLower} help        Show all commands
 /${aiNameLower} debug       Debug issues systematically (saves 60% tokens)
 /${aiNameLower} tdd         Test-driven development (saves 35% tokens)
-/${aiNameLower} brainstorm  Brainstorm solutions (saves 25% tokens)
+/${aiNameLower} brainstorming Brainstorm solutions (saves 25% tokens)
 /${aiNameLower} plan        Write implementation plans
 /${aiNameLower} review      Request code review
 \`\`\`
@@ -208,7 +208,7 @@ ${aiName} is your personal AI assistant for **${projectName}** (${projectType}) 
       }
 
       if (submodule.skills.length > 0) {
-        content += `When tasks involve ${submodule.category.toLowerCase()}, follow ini patterns:\n\n`
+        content += `When tasks involve ${submodule.category.toLowerCase()}, follow these patterns:\n\n`
         for (const skill of submodule.skills) {
           content += `- **${skill.title}**: ${skill.description}\n`
           content += `  - *Trigger:* Ask to use "${skill.command}" or describe the need for ${skill.title.toLowerCase()}.\n\n`
