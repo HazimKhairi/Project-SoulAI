@@ -22,10 +22,9 @@ async function initSkill() {
     const projectName = path.basename(projectDir)
     let projectType = 'web'
 
-    // --- 1. DETECTION LOGIC ---
+    // Detection logic for existing setup
     let existingConfig = null
     let existingAiName = 'SoulAI'
-
     try {
       const claudeSkillsDir = path.join(projectDir, '.claude', 'skills')
       const subdirs = await fs.readdir(claudeSkillsDir)
@@ -34,62 +33,36 @@ async function initSkill() {
         const configPath = path.join(claudeSkillsDir, existingAiName, 'config.json')
         existingConfig = JSON.parse(await fs.readFile(configPath, 'utf8'))
       }
-    } catch (err) {
-      // No existing config found
-    }
+    } catch {}
 
     if (existingConfig) {
       console.log(chalk.yellow(`[!] Existing SoulAI installation detected: ${chalk.bold(existingAiName)}`))
-      const { proceed } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'proceed',
-          message: 'Would you like to update/re-initialize your current setup?',
-          default: true
-        }
-      ])
-      if (!proceed) {
-        console.log(chalk.blue('\n[INFO] Setup cancelled. Nothing changed.'))
-        process.exit(0)
-      }
+      const { proceed } = await inquirer.prompt([{ type: 'confirm', name: 'proceed', message: 'Update current setup?', default: true }])
+      if (!proceed) process.exit(0)
     }
 
-    // Detect project info
-    try {
-      const packageJsonPath = path.join(projectDir, 'package.json')
-      const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
-      if (packageJson.dependencies?.['react']) projectType = 'React'
-      else if (packageJson.dependencies?.['express']) projectType = 'Node.js'
-    } catch {}
-
-    console.log(chalk.cyan(`Setting up SoulAI for: ${chalk.bold(projectName)}`))
-    console.log(chalk.gray(`Project type: ${projectType}\n`))
-
-    // --- 2. UNIVERSAL PROMPTS ---
     const answers = await inquirer.prompt([
       {
         type: 'checkbox',
         name: 'aiTools',
         message: 'Which AI tool(s) are you using?',
         choices: [
-          { name: 'Claude Code', value: 'claude', checked: existingConfig ? !!existingConfig.claude : true },
-          { name: 'Gemini CLI', value: 'gemini', checked: existingConfig ? !!existingConfig.gemini : true }
+          { name: 'Claude Code', value: 'claude', checked: true },
+          { name: 'Gemini CLI', value: 'gemini', checked: true }
         ],
         validate: (input) => input.length > 0 || 'Please select at least one AI tool'
       },
       {
         type: 'input',
         name: 'aiName',
-        message: 'What would you like to name your AI assistant?',
-        default: existingAiName,
-        validate: (input) => /^[a-zA-Z0-9_-]+$/.test(input) || 'Invalid characters in name'
+        message: 'Assistant Name:',
+        default: existingAiName
       }
     ])
 
     const { aiTools, aiName } = answers
     let planChoices = []
 
-    // Plan logic based on AI choice
     if (aiTools.includes('claude') && !aiTools.includes('gemini')) {
       planChoices = [
         { name: 'Claude Pro ($20/mo)', value: 'pro' },
@@ -98,37 +71,28 @@ async function initSkill() {
       ]
     } else if (aiTools.includes('gemini') && !aiTools.includes('claude')) {
       planChoices = [
-        { name: 'Gemini Free/Lite (Standard Limits)', value: 'lite' },
-        { name: 'Gemini Advanced/Pro (High Limits)', value: 'pro' },
-        { name: 'Gemini Heavy/API (Unlimited/Max)', value: 'heavy' }
+        { name: 'Gemini Free (Lite)', value: 'lite' },
+        { name: 'Gemini Pro (Silver)', value: 'pro' },
+        { name: 'Gemini Heavy (Gold)', value: 'heavy' }
       ]
     } else {
       planChoices = [
-        { name: 'Standard / Free (Bronze Tier)', value: 'lite' },
-        { name: 'Professional / Paid (Silver Tier)', value: 'pro' },
-        { name: 'Heavy Usage / Max (Gold Tier)', value: 'heavy' }
+        { name: 'Bronze (Standard)', value: 'lite' },
+        { name: 'Silver (Professional)', value: 'pro' },
+        { name: 'Gold (Heavy)', value: 'heavy' }
       ]
     }
 
     const planAnswer = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'plan',
-        message: 'Select your usage tier (for token optimization):',
-        choices: planChoices,
-        default: existingConfig?.plan || 'pro'
-      }
+      { type: 'list', name: 'plan', message: 'Select your usage tier:', choices: planChoices, default: existingConfig?.plan || 'pro' }
     ])
 
     const plan = planAnswer.plan
     const aiNameLower = aiName.toLowerCase()
-    
-    // Path calculation
     const scriptPath = decodeURIComponent(new URL(import.meta.url).pathname)
     const projectRoot = path.resolve(path.dirname(scriptPath), '..')
 
-    // Start setup
-    console.log(chalk.cyan('\n[INFO] Running Universal Orchestrator...'))
+    console.log(chalk.cyan('\n[INFO] Orchestrating universal environment...'))
     const optimization = getOptimizationConfig(plan)
     
     const downloader = new SubmoduleDownloader(projectRoot)
@@ -136,11 +100,10 @@ async function initSkill() {
     await setupCtx7(projectRoot, true)
 
     const generator = new SkillGenerator(projectRoot)
-    const stats = await generator.scanner.getStats()
 
-    // 3. GENERATION
+    // Handle Claude
     if (aiTools.includes('claude')) {
-      console.log(chalk.cyan(`[INFO] Generating Claude Code skill: ${aiNameLower}`))
+      console.log(chalk.cyan(`[INFO] Configuring Claude Code: ${aiNameLower}`))
       const skillDir = path.join(projectDir, '.claude', 'skills', aiNameLower)
       await fs.mkdir(skillDir, { recursive: true })
       
@@ -151,32 +114,34 @@ async function initSkill() {
       await fs.writeFile(path.join(skillDir, 'mcp-bridge.json'), JSON.stringify(bridge, null, 2))
       
       const config = generateBaseConfig(aiName, plan, projectName, projectDir, projectType, optimization)
-      config.claude = true
       await fs.writeFile(path.join(skillDir, 'config.json'), JSON.stringify(config, null, 2))
-      
       await fs.mkdir(path.join(skillDir, 'commands'), { recursive: true })
     }
 
+    // Handle Gemini
     if (aiTools.includes('gemini')) {
-      console.log(chalk.cyan('[INFO] Generating Gemini CLI mandates: GEMINI.md'))
+      console.log(chalk.cyan('[INFO] Configuring Gemini CLI Extension...'))
+      
+      // 1. GEMINI.md Mandates
       const geminiMdContent = await generator.generateGeminiMd(aiName, plan, projectName, projectType)
       await fs.writeFile(path.join(projectDir, 'GEMINI.md'), geminiMdContent)
+      
+      // 2. gemini-extension.json (Native Integration)
+      const extensionContent = await generator.generateGeminiExtension(aiName, projectRoot)
+      await fs.writeFile(path.join(projectDir, 'gemini-extension.json'), extensionContent)
+      
+      // 3. Register MCP
       await registerGeminiMcp(aiName, projectRoot)
     }
 
-    // SUCCESS MESSAGE
-    console.log(chalk.green(`\n[OK] ${aiName} universal setup successful!\n`))
-    console.log(chalk.bold('💡 Pro Tips for your AI choice:'))
+    console.log(chalk.green(`\n[OK] ${aiName} Universal Setup Complete!\n`))
+    
     if (aiTools.includes('gemini')) {
-      console.log(`${chalk.cyan('Gemini CLI:')} Best for ${chalk.yellow('speed')} and ${chalk.yellow('brainstorming')}.`)
-      console.log(`  Ask: ${chalk.italic(`"Use ${aiName} to quickly map out the architecture"`)}`)
+      console.log(chalk.bold('Gemini Extension Active:'))
+      console.log(`- Mandates: ${chalk.gray('GEMINI.md')}`)
+      console.log(`- Manifest: ${chalk.gray('gemini-extension.json')}`)
+      console.log(`- Ask: ${chalk.cyan('"Use ' + aiName + ' to audit this folder"')}\n`)
     }
-    if (aiTools.includes('claude')) {
-      console.log(`${chalk.cyan('Claude Code:')} Best for ${chalk.yellow('deep reasoning')} and ${chalk.yellow('complex bug fixing')}.`)
-      console.log(`  Ask: ${chalk.italic(`/${aiNameLower} debug (select code)`)}`)
-    }
-
-    console.log(`\nPlan: ${chalk.bold(plan.toUpperCase())} | Agents: ${chalk.bold(optimization.maxParallelAgents)}\n`)
 
   } catch (error) {
     console.error(chalk.red('[ERROR] Setup failed:'), error.stack)
@@ -188,22 +153,13 @@ function getOptimizationConfig(plan) {
   const configs = {
     lite: { maxParallelAgents: 2, tokenBudget: 100000, contextWindow: 'standard' },
     pro: { maxParallelAgents: 5, tokenBudget: 500000, contextWindow: 'high' },
-    heavy: { maxParallelAgents: 15, tokenBudget: 2000000, contextWindow: 'max' },
-    'max-5x': { maxParallelAgents: 8, tokenBudget: 1000000, contextWindow: 'very-high' },
-    'max-20x': { maxParallelAgents: 20, tokenBudget: 4000000, contextWindow: 'unlimited' }
+    heavy: { maxParallelAgents: 15, tokenBudget: 2000000, contextWindow: 'max' }
   }
-  return configs[plan] || configs.lite
+  return configs[plan] || configs.pro
 }
 
 function generateBaseConfig(aiName, plan, projectName, projectDir, projectType, optimization) {
-  return { 
-    version: '1.0.0', 
-    aiName, 
-    plan, 
-    optimization, 
-    project: { name: projectName, path: projectDir, type: projectType }, 
-    createdAt: new Date().toISOString() 
-  }
+  return { version: '1.0.0', aiName, plan, optimization, project: { name: projectName, path: projectDir, type: projectType }, createdAt: new Date().toISOString() }
 }
 
 async function registerGeminiMcp(aiName, projectRoot) {
@@ -214,19 +170,10 @@ async function registerGeminiMcp(aiName, projectRoot) {
       const content = await fs.readFile(mcpConfigPath, 'utf8')
       if (content.trim()) mcpConfig = JSON.parse(content)
     } catch {}
-    
-    mcpConfig.mcpServers = mcpConfig.mcpServers || {}
-    mcpConfig.mcpServers[aiName.toLowerCase()] = { 
-      command: 'node', 
-      args: [path.join(projectRoot, 'bin', 'soulai.js'), 'start'], 
-      env: { PROJECT_ROOT: projectRoot } 
-    }
+    mcpConfig.mcpServers[aiName.toLowerCase()] = { command: 'node', args: [path.join(projectRoot, 'bin', 'soulai.js'), 'start'], env: { PROJECT_ROOT: projectRoot } }
     await fs.mkdir(path.dirname(mcpConfigPath), { recursive: true })
     await fs.writeFile(mcpConfigPath, JSON.stringify(mcpConfig, null, 2))
-    console.log(chalk.green(`[OK] Registered SoulAI as MCP for Gemini CLI`))
-  } catch (err) {
-    console.log(chalk.yellow(`[WARNING] Gemini MCP registration failed: ${err.message}`))
-  }
+  } catch (err) {}
 }
 
 initSkill()
