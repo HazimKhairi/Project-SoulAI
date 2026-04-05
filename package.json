@@ -48,6 +48,6 @@
     "node": ">=20.0.0"
   },
   "keywords": ["claude", "mcp", "ai", "workflow", "coding"],
-  "author": "HakasAI + Hazim",
-  "license": "MIT"
+  "author": "HakasAI + Hazim (HazimKhairi)",
+  "license": "MIT",
 }
