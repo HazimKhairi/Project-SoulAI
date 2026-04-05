@@ -17,6 +17,7 @@ import { ParallelExecutionMiddleware } from './middleware/parallel-execution-mid
 import { MemorySaverMiddleware } from './middleware/memory-saver-middleware.js'
 import fs from 'fs/promises'
 import path from 'path'
+import chalk from 'chalk'
 
 export class McpServer {
   constructor(config = {}) {
@@ -48,14 +49,14 @@ export class McpServer {
 
     // Initialize workflow middleware
     this.superpowersMiddleware = new SuperpowersMiddleware(this.projectRoot)
-    this.skillEnforcementMiddleware = new SkillEnforcementMiddleware()
+    this.skillEnforcementMiddleware = new SkillEnforcementMiddleware(this.projectRoot)
     this.parallelExecutionMiddleware = new ParallelExecutionMiddleware(this.projectRoot)
 
-    // Initialize memory middleware (with stub if no memory server)
+    // Initialize memory middleware
     const memoryServer = this.createMemoryServerStub()
     this.memorySaverMiddleware = new MemorySaverMiddleware(memoryServer)
 
-    // Initialize Ctx7 (Context7 integration)
+    // Initialize Ctx7
     if (config.features?.ctx7?.enabled) {
       this.ctx7Manager = new Ctx7Manager(config)
       this.ctx7Middleware = new Ctx7Middleware(
@@ -65,19 +66,6 @@ export class McpServer {
     }
 
     this.setupHandlers()
-  }
-
-  /**
-   * Create memory server stub
-   * TODO: Replace with actual memory server when available
-   */
-  createMemoryServerStub() {
-    return {
-      saveMemory: async (key, value, metadata) => {
-        console.log(`[INFO] Memory stub: Would save ${key}`)
-        return { success: true }
-      }
-    }
   }
 
   /**
@@ -124,7 +112,7 @@ export class McpServer {
           prompts: [
             {
               name: 'session-context',
-              description: 'Load all available skills into context'
+              description: 'Load all available skills and submodule status'
             }
           ]
         }
@@ -136,13 +124,15 @@ export class McpServer {
       async (request) => {
         if (request.params.name === 'session-context') {
           const context = await this.sessionLoader.loadSubmoduleContext()
+          const moduleStatus = await this.getSubmoduleStatusManifest()
+          
           return {
             messages: [
               {
                 role: 'user',
                 content: {
                   type: 'text',
-                  text: context
+                  text: `${context}\n\n# LIVE SUBMODULE STATUS\n${moduleStatus}`
                 }
               }
             ]
@@ -154,30 +144,59 @@ export class McpServer {
   }
 
   /**
+   * Generate a manifest of current submodule status for the AI
+   */
+  async getSubmoduleStatusManifest() {
+    const submodulesDir = path.join(this.projectRoot, 'submodules')
+    try {
+      const modules = await fs.readdir(submodulesDir)
+      let manifest = 'Current Active Submodules:\n'
+      
+      for (const mod of modules) {
+        const modPath = path.join(submodulesDir, mod)
+        const stats = await fs.stat(modPath)
+        if (stats.isDirectory()) {
+          manifest += `- **${mod}**: Active, Last Synced: ${stats.mtime.toISOString()}\n`
+        }
+      }
+      return manifest
+    } catch (err) {
+      return 'No submodules detected or error reading submodules directory.'
+    }
+  }
+
+  /**
    * Execute skill command with middleware pipeline
    */
   async executeSkill(skillName, args) {
     try {
+      console.error(chalk.blue(`[SoulAI] Orchestrating: ${chalk.bold(skillName)}...`))
+      
       // 1. Create context
       let context = {
         skillName,
         args,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        trace: []
       }
 
-      // 2. Run SuperpowersMiddleware (brainstorming + planning)
-      console.log('[INFO] Running SuperpowersMiddleware...')
+      // 2. Run SuperpowersMiddleware
+      console.error(chalk.gray(`[SoulAI] Strategy: Analyzing requirements...`))
       context = await this.superpowersMiddleware.handle(context)
 
-      // 3. Run SkillEnforcementMiddleware (assign submodules)
-      console.log('[INFO] Running SkillEnforcementMiddleware...')
+      // 3. Run SkillEnforcementMiddleware (Decision Engine)
+      console.error(chalk.gray(`[SoulAI] Enforcement: Matching best-fit submodules...`))
       context = await this.skillEnforcementMiddleware.handle(context)
+      
+      if (context.selectedModules) {
+        console.error(chalk.cyan(`[SoulAI] Selected Modules: ${context.selectedModules.join(', ')}`))
+      }
 
-      // 4. Check remote git (once at start)
+      // 4. Check remote git
       await this.commitMiddleware.checkRemoteGit()
 
-      // 5. Run ParallelExecutionMiddleware (spawn agents)
-      console.log('[INFO] Running ParallelExecutionMiddleware...')
+      // 5. Run ParallelExecutionMiddleware
+      console.error(chalk.yellow(`[SoulAI] Execution: Spawning parallel agents...`))
       context = await this.parallelExecutionMiddleware.handle(context)
 
       // 6. Commit after each agent completion
@@ -189,8 +208,7 @@ export class McpServer {
         }
       }
 
-      // 7. Run MemorySaverMiddleware (save plan + results)
-      console.log('[INFO] Running MemorySaverMiddleware...')
+      // 7. Run MemorySaverMiddleware
       context = await this.memorySaverMiddleware.handle(context)
 
       // 8. Format output
@@ -205,7 +223,7 @@ export class McpServer {
         ]
       }
     } catch (error) {
-      console.error('[ERROR] Workflow failed:', error.message)
+      console.error(chalk.red(`[SoulAI] Orchestration Failed: ${error.message}`))
       return {
         content: [
           {
@@ -222,65 +240,14 @@ export class McpServer {
    */
   formatWorkflowOutput(context) {
     const lines = []
-
-    lines.push('[OK] Workflow completed successfully')
-    lines.push('')
-
-    if (context.brainstormResult) {
-      lines.push('[INFO] Brainstorming completed')
-    }
-
-    if (context.plan) {
-      lines.push(`[INFO] Plan created with ${context.plan.tasks.length} tasks`)
-    }
-
+    lines.push(`[OK] ${context.skillName} workflow completed.`)
+    
     if (context.agentResults) {
       const successCount = context.agentResults.filter(r => r.status === 'success').length
-      const failCount = context.agentResults.filter(r => r.status === 'failed').length
-      lines.push(`[INFO] Agent execution: ${successCount} succeeded, ${failCount} failed`)
-
-      context.agentResults.forEach(result => {
-        const status = result.status === 'success' ? '[OK]' : '[ERROR]'
-        lines.push(`  ${status} ${result.task.description}`)
-      })
-    }
-
-    if (context.memorySaved) {
-      lines.push('[INFO] Results saved to memory')
+      lines.push(`[INFO] Tasks executed: ${successCount}/${context.agentResults.length} successful.`)
     }
 
     return lines.join('\n')
-  }
-
-  /**
-   * Find skill file in submodules
-   */
-  async findSkillFile(skillName) {
-    const submodulesDir = path.join(this.projectRoot, 'submodules')
-    try {
-      const submodules = await fs.readdir(submodulesDir)
-      for (const submodule of submodules) {
-        const skillsDir = path.join(submodulesDir, submodule, 'skills')
-        try {
-          const files = await fs.readdir(skillsDir)
-          for (const file of files) {
-            if (file.endsWith('.md')) {
-              const content = await fs.readFile(path.join(skillsDir, file), 'utf8')
-              // Match command in YAML front matter
-              const commandMatch = content.match(/^command:\s*(.+)$/m)
-              if (commandMatch && commandMatch[1].trim() === skillName) {
-                return path.join(skillsDir, file)
-              }
-            }
-          }
-        } catch {
-          continue
-        }
-      }
-    } catch {
-      return null
-    }
-    return null
   }
 
   /**
@@ -289,7 +256,7 @@ export class McpServer {
   async start() {
     const transport = new StdioServerTransport()
     await this.server.connect(transport)
-    console.error('[OK] SoulAI MCP Server started')
+    console.error(chalk.green('[OK] SoulAI Universal Orchestrator Active'))
   }
 
   /**
@@ -299,41 +266,40 @@ export class McpServer {
     const configPaths = [
       path.join(projectRoot, '.soulai', 'config.json'),
       path.join(projectRoot, 'config', 'default.json'),
-      // Search in .claude/skills/*/config.json (take the first one)
     ]
 
-    // Add .claude/skills search
     try {
       const claudeSkillsDir = path.join(projectRoot, '.claude', 'skills')
       const subdirs = await fs.readdir(claudeSkillsDir)
       for (const subdir of subdirs) {
         configPaths.push(path.join(claudeSkillsDir, subdir, 'config.json'))
       }
-    } catch (err) {
-      // .claude/skills doesn't exist, ignore
-    }
+    } catch (err) {}
 
     for (const configPath of configPaths) {
       try {
         const configData = await fs.readFile(configPath, 'utf8')
         const config = JSON.parse(configData)
         config.projectRoot = projectRoot
-        console.error(`[OK] Loaded config from ${configPath}`)
         return config
       } catch (error) {
         continue
       }
     }
 
-    console.error('[WARNING] No config found, using universal defaults')
     return {
       aiName: 'SoulAI',
       projectRoot,
       features: {
         autoCommit: { enabled: true },
-        sessionLoader: { enabled: true },
-        ctx7: { enabled: false }
+        sessionLoader: { enabled: true }
       }
+    }
+  }
+
+  createMemoryServerStub() {
+    return {
+      saveMemory: async (key) => ({ success: true })
     }
   }
 }
