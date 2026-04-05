@@ -188,7 +188,9 @@ function getOptimizationConfig(plan) {
   const configs = {
     lite: { maxParallelAgents: 2, tokenBudget: 100000, contextWindow: 'standard' },
     pro: { maxParallelAgents: 5, tokenBudget: 500000, contextWindow: 'high' },
-    heavy: { maxParallelAgents: 15, tokenBudget: 2000000, contextWindow: 'max' }
+    heavy: { maxParallelAgents: 15, tokenBudget: 2000000, contextWindow: 'max' },
+    'max-5x': { maxParallelAgents: 8, tokenBudget: 1000000, contextWindow: 'very-high' },
+    'max-20x': { maxParallelAgents: 20, tokenBudget: 4000000, contextWindow: 'unlimited' }
   }
   return configs[plan] || configs.lite
 }

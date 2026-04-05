@@ -21,11 +21,13 @@ export class SkillGenerator {
     const aiNameLower = aiName.toLowerCase()
 
     const planLimits = {
+      'lite': { daily: '10K', weekly: '70K', monthly: '300K' },
       'pro': { daily: '28K', weekly: '200K', monthly: '800K' },
+      'heavy': { daily: '1M', weekly: '7M', monthly: '30M' },
       'max-5x': { daily: '142K', weekly: '1M', monthly: '4M' },
       'max-20x': { daily: '571K', weekly: '4M', monthly: '16M' }
     }
-    const budgetDisplay = planLimits[plan]
+    const budgetDisplay = planLimits[plan] || planLimits['pro']
 
     let content = `---
 name: ${aiNameLower}
@@ -168,12 +170,14 @@ ${scanned.map(s => `- **${s.name}-server**: Handles ${s.category} (${s.count} sk
    */
   generateConfigSection(aiName, plan, stats) {
     const planInfo = {
-      'pro': { agents: 3, tokens: '200K', context: 'High' },
+      'lite': { agents: 2, tokens: '100K', context: 'Standard' },
+      'pro': { agents: 5, tokens: '500K', context: 'High' },
+      'heavy': { agents: 15, tokens: '2M', context: 'Max' },
       'max-5x': { agents: 8, tokens: '1M', context: 'Very High' },
       'max-20x': { agents: 20, tokens: '4M', context: 'Unlimited' }
     }
 
-    const info = planInfo[plan]
+    const info = planInfo[plan] || planInfo['pro']
 
     return `## Configuration
 
@@ -197,12 +201,14 @@ ${stats.bySubmodule.map(s => `- ${s.icon} ${s.name}: ${s.count} skills`).join('\
    */
   async generateTokenUsageSection(plan) {
     const planLimits = {
+      'lite': { daily: 10000, weekly: 70000, monthly: 300000 },
       'pro': { daily: 28571, weekly: 200000, monthly: 800000 },
+      'heavy': { daily: 1000000, weekly: 7000000, monthly: 30000000 },
       'max-5x': { daily: 142857, weekly: 1000000, monthly: 4000000 },
       'max-20x': { daily: 571429, weekly: 4000000, monthly: 16000000 }
     }
 
-    const limits = planLimits[plan]
+    const limits = planLimits[plan] || planLimits['pro']
     const currentDate = new Date().toISOString().split('T')[0]
 
     // Try to get current usage
