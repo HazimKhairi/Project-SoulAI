@@ -42,35 +42,43 @@ export class SkillScanner {
   }
 
   /**
-   * Scan a specific submodule for skills
+   * Scan a specific submodule for skills recursively
    */
   async scanSubmodule(submoduleName) {
-    const skillsDir = path.join(this.submodulesDir, submoduleName, 'skills')
+    const submodulePath = path.join(this.submodulesDir, submoduleName)
+    const skills = []
 
     try {
-      await fs.access(skillsDir)
+      await fs.access(submodulePath)
     } catch {
       return []
     }
 
-    const entries = await fs.readdir(skillsDir, { withFileTypes: true })
-    const skills = []
-
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue
-
-      const skillPath = path.join(skillsDir, entry.name, 'SKILL.md')
-
-      try {
-        const content = await fs.readFile(skillPath, 'utf8')
-        const skill = await this.parseSkill(entry.name, skillPath, content)
-        skills.push(skill)
-      } catch {
-        // Skill doesn't have SKILL.md, skip
-        continue
+    const findSkills = async (dir) => {
+      const entries = await fs.readdir(dir, { withFileTypes: true })
+      
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name)
+        
+        if (entry.isDirectory()) {
+          // Avoid node_modules and .git
+          if (entry.name === 'node_modules' || entry.name === '.git') continue
+          await findSkills(fullPath)
+        } else if (entry.name === 'SKILL.md') {
+          try {
+            const content = await fs.readFile(fullPath, 'utf8')
+            const skillDir = path.dirname(fullPath)
+            const skillName = path.basename(skillDir)
+            const skill = await this.parseSkill(skillName, fullPath, content)
+            skills.push(skill)
+          } catch (e) {
+            // Skip if error reading
+          }
+        }
       }
     }
 
+    await findSkills(submodulePath)
     return skills
   }
 
