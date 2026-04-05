@@ -167,8 +167,8 @@ export class TokenUsageReader {
     }
 
     const formatBar = (current, max) => {
-      const percent = Math.round((current / max) * 100)
-      const filled = Math.round(percent / 10)
+      const percent = max > 0 ? Math.round((current / max) * 100) : 0
+      const filled = Math.min(10, Math.max(0, Math.round(percent / 10)))
       const empty = 10 - filled
       return `${'█'.repeat(filled)}${'░'.repeat(empty)} ${percent}%`
     }
