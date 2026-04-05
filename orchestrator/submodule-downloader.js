@@ -12,7 +12,8 @@ const SUBMODULES = {
   'superpowers': 'https://github.com/obra/superpowers.git',
   'everything-claude-code': 'https://github.com/ProfSynapse/everything-claude-code.git',
   'ui-ux-pro-max-skill': 'https://github.com/ProfSynapse/ui-ux-pro-max-skill.git',
-  'claude-mem': 'https://github.com/ProfSynapse/claude-mem.git'
+  'claude-mem': 'https://github.com/ProfSynapse/claude-mem.git',
+  'browser-use': 'https://github.com/browser-use/browser-use.git'
 };
 
 class SubmoduleDownloader {

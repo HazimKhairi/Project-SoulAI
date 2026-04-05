@@ -27,6 +27,11 @@ export class SkillEnforcementMiddleware {
         filePatterns: /MEMORY\.md$/i,
         weight: 1.1
       },
+      'browser-use': {
+        keywords: ['browser', 'web', 'automation', 'scrape', 'navigate', 'click', 'website', 'extract', 'online', 'internet', 'search the web'],
+        filePatterns: /\.(py)$/i,
+        weight: 1.3
+      },
       'everything-claude-code': {
         keywords: ['backend', 'api', 'database', 'sql', 'logic', 'function', 'service', 'controller', 'middleware', 'auth', 'security', 'deployment', 'docker', 'cloud'],
         filePatterns: /\.(js|ts|py|go|rs|java|kt|swift|php|cs|cpp|ex|exs)$/i,

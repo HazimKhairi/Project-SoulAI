@@ -87,6 +87,27 @@ async function initSkill() {
       { type: 'list', name: 'plan', message: 'Select your usage tier:', choices: planChoices, default: existingConfig?.plan || 'pro' }
     ])
 
+    const browserUseAnswer = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'browserUseKey',
+        message: 'Enter your Browser Use API Key (optional, press Enter to skip):',
+      }
+    ])
+
+    if (browserUseAnswer.browserUseKey) {
+      const envPath = path.join(projectDir, '.env');
+      try {
+        await fs.appendFile(envPath, `\nBROWSER_USE_API_KEY=${browserUseAnswer.browserUseKey}\n`);
+        console.log(chalk.green('[OK] BROWSER_USE_API_KEY saved to .env'));
+      } catch (err) {
+        console.error(chalk.red(`[ERROR] Could not save API key to .env: ${err.message}`));
+      }
+    } else {
+      console.log(chalk.yellow('[INFO] Browser Use API Key skipped. You can get one from Browser Use Cloud.'));
+      console.log(chalk.gray('       Add BROWSER_USE_API_KEY=your-key to your .env file later.'));
+    }
+
     const plan = planAnswer.plan
     const aiNameLower = aiName.toLowerCase()
     const scriptPath = decodeURIComponent(new URL(import.meta.url).pathname)
@@ -98,6 +119,9 @@ async function initSkill() {
     const downloader = new SubmoduleDownloader(projectRoot)
     await downloader.downloadAll()
     await setupCtx7(projectRoot, true)
+
+    console.log(chalk.cyan('\n[INFO] To fully enable browser-use, ensure you have Python >= 3.11 and uv installed.'));
+    console.log(chalk.gray('       Run: uv init && uv add browser-use && uv sync'));
 
     const generator = new SkillGenerator(projectRoot)
 
