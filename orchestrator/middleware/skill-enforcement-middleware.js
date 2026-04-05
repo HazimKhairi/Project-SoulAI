@@ -5,7 +5,7 @@ export class SkillEnforcementMiddleware {
   constructor(projectRoot) {
     this.projectRoot = projectRoot
     
-    // Core Submodules definitions - Now including context7 and claude-mem
+    // Core Submodules definitions
     this.submoduleCapabilities = {
       'ui-ux-pro-max-skill': {
         keywords: ['ui', 'ux', 'design', 'interface', 'frontend', 'component', 'layout', 'style', 'css', 'html', 'responsive', 'mobile', 'button', 'form', 'navbar', 'header', 'footer', 'modal', 'color', 'typography', 'spacing', 'grid', 'flex', 'theme', 'animation', 'transition', 'hover', 'click'],
@@ -20,7 +20,7 @@ export class SkillEnforcementMiddleware {
       'context7': {
         keywords: ['search', 'docs', 'documentation', 'retrieval', 'find', 'reference', 'library', 'api docs', 'research', 'semantic', 'query'],
         filePatterns: /\.(md|txt|pdf)$/i,
-        weight: 1.4 // High priority for research tasks
+        weight: 1.4
       },
       'claude-mem': {
         keywords: ['remember', 'memory', 'history', 'persistent', 'save', 'recall', 'past session', 'context', 'archive', 'store'],
@@ -43,11 +43,14 @@ export class SkillEnforcementMiddleware {
   }
 
   /**
-   * Main middleware handler with dynamic fine-tuning
+   * Main middleware handler with multi-module orchestration logic
    */
   async handle(context) {
+    console.error(`[SoulAI] Orchestrating feature: ${context.skillName}...`)
+    
+    // If no explicit plan, brainstorm one first to identify tasks
     if (!context.plan || !context.plan.tasks) {
-      return context
+      context.plan = await this.autoDecompose(context.skillName, context.args)
     }
 
     const selectedModules = new Set()
@@ -57,18 +60,39 @@ export class SkillEnforcementMiddleware {
       task.submodule = decision.module
       task.confidence = decision.confidence
       
+      console.error(`[SoulAI] Task "${task.id}" assigned to -> ${chalk.bold(decision.module)} (Conf: ${decision.confidence})`)
       selectedModules.add(decision.module)
     }
 
     context.selectedModules = Array.from(selectedModules)
     
+    if (context.selectedModules.length > 1) {
+      console.error(`[SoulAI] Multi-module collaboration detected: ${context.selectedModules.join(' + ')}`)
+    }
+
     context.trace.push({
       phase: 'enforcement',
-      decision: `Orchestrated using: ${context.selectedModules.join(', ')}`,
+      decision: `Unified ${context.selectedModules.length} workers: ${context.selectedModules.join(', ')}`,
       timestamp: new Date().toISOString()
     })
 
     return context
+  }
+
+  /**
+   * Automatically break down a request if no plan exists
+   */
+  async autoDecompose(skillName, args) {
+    // Simple heuristic-based decomposition
+    // In a real scenario, this would call an LLM 'brainstorm' agent
+    return {
+      tasks: [
+        { id: 'research', description: `Research documentation for ${args}`, type: 'research' },
+        { id: 'implementation', description: `Implement core logic for ${args}`, type: 'code' },
+        { id: 'ui', description: `Apply styling and UI components for ${args}`, type: 'ui' },
+        { id: 'testing', description: `Verify ${args} with unit tests`, type: 'test' }
+      ]
+    }
   }
 
   /**
