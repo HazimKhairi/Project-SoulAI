@@ -10,30 +10,35 @@ SoulAI is a deterministic, skill-based orchestration framework designed to bridg
 
 Modern AI development tools often operate in isolation, leading to redundant context usage and fragmented workflows. SoulAI provides a unified interface and a library of **161+ modular skills** that allow AI agents to operate with precision, consistency, and structural integrity.
 
-By abstracting complex development patterns into executable "Skills," SoulAI enables:
-- **Token Efficiency:** Reduces overhead through shared context and parallel execution.
-- **Workflow Consistency:** Enforces standardized patterns across different LLMs.
-- **Cross-Platform Support:** Seamless integration with Claude Code and Gemini CLI.
-
 ---
 
 ## 🚀 Key Features
 
-### ✨ New: Colorful System Banner
-The `soulai` CLI now features a vibrant, informative system banner (similar to `screenfetch`) that displays essential project info, skill counts, and engine status in a clean, professional format.
+### 🧠 Master Orchestrator (Mandur Utama)
+SoulAI acts as the central intelligence that breaks down complex features into specialized tasks. It automatically selects and coordinates multiple submodules (Workers) to collaborate on a single feature, ensuring high-quality output with minimal token waste.
 
-### Intelligent Workflow Orchestration
-SoulAI utilizes a four-stage middleware pipeline to coordinate multi-agent teams for complex tasks:
-- **Strategy Phase:** Brainstorms and defines implementation paths.
-- **Enforcement Phase:** Matches specialized agents to specific sub-domains (UI/UX, Backend, Security).
-- **Execution Phase:** Spawns parallel agents to accelerate development cycles.
-- **Commit Phase:** Automatically manages granular version control history.
+### 🤖 Multi-Module Collaboration
+One request can now trigger multiple experts:
+- **UI/UX Pro Max**: Handles design, styling, and frontend components.
+- **Everything Claude Code**: Manages backend logic, APIs, and cloud services.
+- **Superpowers**: Enforces TDD, systematic debugging, and code reviews.
+- **Context7**: Performs deep documentation research and RAG.
+- **Browser-Use**: Automates web navigation and data extraction.
 
-### Universal Skill Library
-Access a growing library of 161+ skills distributed across specialized submodules:
-- **Superpowers:** Systematic debugging, TDD, and architectural planning.
-- **Everything Claude Code:** Domain-specific expertise in 12+ languages and 10+ frameworks.
-- **Context7:** Semantic search and RAG-based documentation retrieval.
+### ✨ Colorful System Banner
+The `soulai` CLI features a vibrant system banner that displays real-time project info, skill counts, and active submodule status.
+
+---
+
+## 📦 Submodule Workers
+
+SoulAI orchestrates the following specialized modules:
+- **🦸 Superpowers**: Core development workflows: brainstorming, TDD, debugging, planning.
+- **💻 Everything Claude Code**: Multi-language backend logic, security, and deployment.
+- **🎨 UI/UX Pro Max**: AI-driven design systems and polished frontend implementation.
+- **🔍 Context7**: Semantic documentation search and reference retrieval.
+- **🧠 Claude Mem**: Persistent cross-session memory and context archiving.
+- **🌐 Browser-Use**: Web automation, scraping, and online research agents.
 
 ---
 
@@ -42,28 +47,22 @@ Access a growing library of 161+ skills distributed across specialized submodule
 ### Prerequisites
 - Node.js >= 20.0.0
 - Git
+- Python >= 3.11 & `uv` (for browser-use)
 - Access to Claude Code or Gemini CLI
 
 ### Installation & Global Setup
-To use SoulAI as a global CLI tool that always stays updated with your local development changes, follow these steps:
-
 ```bash
-# Clone the repository
+# Clone and enter the repository
 git clone https://github.com/HazimKhairi/Project-SoulAI.git
 cd Project-SoulAI
 
-# Install dependencies
+# Install and link globally
 npm install
-
-# Initialize submodules
-git submodule update --init --recursive
-
-# Link locally to use 'soulai' command everywhere
 npm link
 ```
 
 ### Initialization
-Run the universal setup to configure SoulAI for your project and preferred AI tools:
+Run the universal installer to configure SoulAI and its submodules for your environment:
 ```bash
 soulai init
 ```
@@ -73,60 +72,35 @@ soulai init
 ## 💡 Usage
 
 ### CLI Overview
-Simply type `soulai` in your terminal to see the new system banner and a list of core commands:
+Simply type `soulai` to see the system banner and available commands.
 
-```bash
-soulai
-```
-
-### Using Claude Code
-Invoke SoulAI skills directly from the Claude Code interface using your assistant's invocation name:
-```bash
-/{your-ai-name} debug
-/{your-ai-name} plan
-```
-
-### Using Gemini CLI
-SoulAI mandates are automatically loaded from `GEMINI.md`. Trigger workflows through natural language:
-- "Use {your-ai-name} to analyze this codebase."
-- "Start a TDD session for a new auth module."
+### Using your AI Assistant
+Invoke your assistant (e.g., `/ejenai`) and describe your feature. SoulAI will:
+1. **Announce** the submodule it is using.
+2. **Decompose** the task if it's complex.
+3. **Execute** using the best-fit submodule workers.
 
 ---
 
 ## 🏗️ Technical Architecture
 
-SoulAI operates as an MCP (Model Context Protocol) server via stdio, facilitating low-latency communication between the AI CLI and the skill execution engine.
+SoulAI operates as an MCP (Model Context Protocol) server, coordinating a swarm of specialized skill submodules.
 
 ```
-┌───────────────────┐      ┌───────────────────┐
-│  Claude Code CLI  │      │    Gemini CLI     │
-└─────────┬─────────┘      └─────────┬─────────┘
-          │                          │
-          └───────────┬──────────────┘
-                      │
             ┌─────────▼─────────┐
-            │ SoulAI Orchestrator│ (MCP Server)
+            │ SoulAI Orchestrator│ (Master Mandur)
             └─────────┬─────────┘
-                      │
       ┌───────────────┼───────────────┐
       ▼               ▼               ▼
 ┌───────────┐   ┌───────────┐   ┌───────────┐
-│ Skills    │   │ Memory    │   │ Search    │
+│ Workers   │   │  Memory   │   │  Search   │
 └───────────┘   └───────────┘   └───────────┘
 ```
 
 ---
 
-## 🤝 Contributing
-
-We welcome contributions to the SoulAI ecosystem. Please refer to `CONTRIBUTING.md` for guidelines on submitting pull requests, reporting issues, and suggesting new skills.
-
----
-
 ## 📄 License
-
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+This project is licensed under the MIT License.
 
 ---
-
 **Generated by SoulAI v1.0.0**
